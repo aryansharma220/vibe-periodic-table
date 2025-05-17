@@ -52,14 +52,17 @@ function createPeriodicTable(elements) {
     
     periodicTable.innerHTML = '';
       elements.forEach(element => {
-        const elementDiv = document.createElement('div');
-        elementDiv.className = `element ${getCategoryClass(element.category, categoryClasses)}`;
+        const elementDiv = document.createElement('div');        elementDiv.className = `element ${getCategoryClass(element.category, categoryClasses)}`;
         elementDiv.dataset.atomicNumber = element.number;
-        // Store CSS class name instead of raw category for filtering
         elementDiv.dataset.category = getCategoryClass(element.category, categoryClasses);
         elementDiv.dataset.state = element.phase || 'unknown';
         elementDiv.dataset.period = element.period || '';
         elementDiv.dataset.group = element.group || '';
+        
+        // Make elements focusable for keyboard navigation
+        elementDiv.tabIndex = 0;
+        elementDiv.setAttribute('role', 'button');
+        elementDiv.setAttribute('aria-label', `${element.name}, atomic number ${element.number}, ${element.category}`);
         
         elementDiv.style.gridColumn = element.group || 1;
         elementDiv.style.gridRow = element.period || 1;
@@ -119,13 +122,17 @@ function createPeriodicTable(elements) {
     lanthanideMarker.innerHTML = `
         <div class="symbol">La-Lu</div>
         <div class="name">57-71</div>
-    `;
-    // Add data attributes to clearly identify this as a marker block and ensure it's excluded from all filters
+    `;    // Add data attributes to clearly identify this as a marker block and ensure it's excluded from all filters
     lanthanideMarker.dataset.isMarker = 'true';
     lanthanideMarker.dataset.category = 'lanthanide';
     lanthanideMarker.dataset.state = 'marker';  // Special state for markers
     lanthanideMarker.dataset.period = 'marker'; // Special period for markers
     lanthanideMarker.dataset.group = 'marker';  // Special group for markers
+    
+    // Make marker blocks focusable for keyboard navigation
+    lanthanideMarker.tabIndex = 0;
+    lanthanideMarker.setAttribute('role', 'button');
+    lanthanideMarker.setAttribute('aria-label', 'Lanthanide elements, atomic numbers 57 to 71');
     
     lanthanideMarker.addEventListener('click', () => {
         document.querySelectorAll('.element.lanthanide').forEach(el => {
@@ -145,13 +152,17 @@ function createPeriodicTable(elements) {
     actinideMarker.innerHTML = `
         <div class="symbol">Ac-Lr</div>
         <div class="name">89-103</div>
-    `;
-    // Add data attributes to clearly identify this as a marker block and ensure it's excluded from all filters
+    `;    // Add data attributes to clearly identify this as a marker block and ensure it's excluded from all filters
     actinideMarker.dataset.isMarker = 'true';
     actinideMarker.dataset.category = 'actinide';
     actinideMarker.dataset.state = 'marker';  // Special state for markers
     actinideMarker.dataset.period = 'marker'; // Special period for markers
     actinideMarker.dataset.group = 'marker';  // Special group for markers
+    
+    // Make marker blocks focusable for keyboard navigation
+    actinideMarker.tabIndex = 0;
+    actinideMarker.setAttribute('role', 'button');
+    actinideMarker.setAttribute('aria-label', 'Actinide elements, atomic numbers 89 to 103');
     
     actinideMarker.addEventListener('click', () => {
         document.querySelectorAll('.element.actinide').forEach(el => {
@@ -380,10 +391,30 @@ function createLegend() {
 }
 
 // Set up event listeners for search and filters
-function setupEventListeners() {
-    // Search functionality
+function setupEventListeners() {    // Search functionality
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
+    
+    // Create debounce function to improve performance for real-time search
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+    
+    // Function to show a visual indicator that search is in progress
+    function showSearchingIndicator() {
+        // Add a class to the search box to show search is in progress
+        const searchBox = document.querySelector('.search-box');
+        searchBox.classList.add('searching');
+        
+        // Remove the class after the debounce time to show search is complete
+        setTimeout(() => {
+            searchBox.classList.remove('searching');
+        }, 300);
+    }
     
     const handleSearch = () => {
         const searchTerm = searchInput.value.trim().toLowerCase();
@@ -391,6 +422,9 @@ function setupEventListeners() {
             clearFilters();
             return;
         }
+        
+        // Show search indicator for immediate feedback
+        showSearchingIndicator();
         
         // Reset filter dropdowns to avoid conflicts
         document.getElementById('category-filter').value = 'all';
@@ -402,18 +436,38 @@ function setupEventListeners() {
         document.querySelectorAll('.element').forEach(el => {
             el.classList.remove('filtered-out');
             el.classList.remove('filtered-in');
+            el.classList.remove('exact-match');
         });
-          // Then apply search filter
+          
+        // Then apply search filter
         let matchCount = 0;
-
-        document.querySelectorAll('.element').forEach(el => {
-            // Skip marker blocks using the data attribute
+        let exactMatch = null;
+        
+        // Cache elements and their data to improve search performance
+        const elements = document.querySelectorAll('.element');
+        const elementDataMap = new Map(); // Use a Map for faster lookups
+        
+        elements.forEach(el => {
+            // Special handling for marker blocks
             if (el.dataset.isMarker === 'true') {
-                // Ensure markers are never affected by search filtering
-                el.classList.remove('filtered-in');
-                el.classList.remove('filtered-out');
-                // Still show marker blocks during search
-                el.style.display = '';
+                const symbol = el.querySelector('.symbol')?.textContent?.toLowerCase() || '';
+                const name = el.querySelector('.name')?.textContent?.toLowerCase() || '';
+                
+                // Only show marker blocks if they match the search term
+                const isMarkerMatch = 
+                    symbol.includes(searchTerm) ||
+                    name.includes(searchTerm) ||
+                    (el.dataset.category && el.dataset.category.toLowerCase().includes(searchTerm));
+                    
+                if (isMarkerMatch) {
+                    el.style.display = ''; // Show the marker
+                    el.classList.add('filtered-in');
+                    el.classList.remove('filtered-out');
+                } else {
+                    el.style.display = 'none'; // Hide the marker
+                    el.classList.remove('filtered-in');
+                    el.classList.add('filtered-out');
+                }
                 return;
             }
             
@@ -423,32 +477,43 @@ function setupEventListeners() {
                 return;
             }
             
-            const symbol = el.querySelector('.symbol')?.textContent?.toLowerCase() || '';
-            const name = el.querySelector('.name')?.textContent?.toLowerCase() || '';
-            const number = el.querySelector('.number')?.textContent || '';
+            const number = numElement.textContent || '';
+            // Cache element data for faster lookup
+            if (!elementDataMap.has(number)) {
+                const elementData = allElements.find(e => e.number == number);
+                if (elementData) {
+                    elementDataMap.set(number, {
+                        element: elementData,
+                        symbol: elementData.symbol.toLowerCase(),
+                        name: elementData.name.toLowerCase(),
+                        category: elementData.category.toLowerCase(),
+                        phase: elementData.phase ? elementData.phase.toLowerCase() : '',
+                        electronConfig: elementData.electron_configuration ? elementData.electron_configuration.toLowerCase() : '',
+                    });
+                }
+            }
             
-            // Get corresponding element data to search in other properties
-            const elementData = allElements.find(e => e.number == number);
-            if (!elementData) return;
+            const data = elementDataMap.get(number);
+            if (!data) return;
             
             // Check for exact symbol match (prioritize this)
-            const exactSymbolMatch = elementData.symbol.toLowerCase() === searchTerm;
-            
-            // More comprehensive search to include other properties
-            const isMatch = exactSymbolMatch || 
-                symbol.includes(searchTerm) || 
-                name.includes(searchTerm) || 
+            const isExactSymbolMatch = data.symbol === searchTerm;
+              // More comprehensive search to include other properties
+            const isMatch = isExactSymbolMatch || 
+                data.symbol.includes(searchTerm) || 
+                data.name.includes(searchTerm) || 
                 number.includes(searchTerm) ||
-                (elementData.category.toLowerCase().includes(searchTerm)) ||
-                (elementData.phase && elementData.phase.toLowerCase().includes(searchTerm)) ||
-                (elementData.electron_configuration && elementData.electron_configuration.toLowerCase().includes(searchTerm));
+                data.category.includes(searchTerm) ||
+                data.phase.includes(searchTerm) ||
+                data.electronConfig.includes(searchTerm);
             
             if (isMatch) {
                 el.classList.add('filtered-in');
                 
                 // If it's an exact symbol match, highlight it specially
-                if (exactSymbolMatch) {
+                if (isExactSymbolMatch) {
                     el.classList.add('exact-match');
+                    exactMatch = el;
                 }
                 
                 matchCount++;
@@ -456,67 +521,158 @@ function setupEventListeners() {
                 el.classList.add('filtered-out');
             }
         });
-    };
-      searchBtn.addEventListener('click', () => {
-        handleSearch();
-        // Update filter count after search
+          // Update filter count
         updateFilterCounts();
         
-        // If there's only one match, show its details
-        const visibleElements = document.querySelectorAll('.element.filtered-in');
-        if (visibleElements.length === 1) {
-            const atomicNumber = visibleElements[0].dataset.atomicNumber;
-            const element = allElements.find(e => e.number == atomicNumber);
-            if (element) {
-                showElementDetails(element);
-                visibleElements[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-        
-        // If there's an exact match, show its details immediately
-        const exactMatch = document.querySelector('.element.exact-match');
+        // Show details based on matches
         if (exactMatch) {
+            // If there's an exact match, prioritize that
             const atomicNumber = exactMatch.dataset.atomicNumber;
             const element = allElements.find(e => e.number == atomicNumber);
             if (element) {
                 showElementDetails(element);
                 exactMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-        }
-    });
-    
-    searchInput.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
-            handleSearch();
-            // Update UI after search
-            updateFilterCounts();
-            
-            // Check for exact match or single result
-            const exactMatch = document.querySelector('.element.exact-match');
-            if (exactMatch) {
-                const atomicNumber = exactMatch.dataset.atomicNumber;
+        } else if (matchCount === 1) {
+            // If there's only one matching element, show its details
+            const singleMatch = document.querySelector('.element.filtered-in:not([data-is-marker="true"])');
+            if (singleMatch) {
+                const atomicNumber = singleMatch.dataset.atomicNumber;
                 const element = allElements.find(e => e.number == atomicNumber);
                 if (element) {
                     showElementDetails(element);
-                    exactMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            } else {
-                const visibleElements = document.querySelectorAll('.element.filtered-in');
-                if (visibleElements.length === 1) {
-                    const atomicNumber = visibleElements[0].dataset.atomicNumber;
-                    const element = allElements.find(e => e.number == atomicNumber);
-                    if (element) {
-                        showElementDetails(element);
-                        visibleElements[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                    singleMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
+        } else if (matchCount === 0) {
+            // No matches found - show a "no results" message in the details panel
+            const detailsDiv = document.getElementById('element-details');
+            detailsDiv.innerHTML = `
+                <div class="no-results">
+                    <h2>No Results Found</h2>
+                    <p>No elements match the search term: <strong>"${searchTerm}"</strong></p>
+                    <button id="clear-search-from-results" class="clear-search-btn">Clear Search</button>
+                </div>
+            `;
+            
+            // Add event listener to the clear search button
+            document.getElementById('clear-search-from-results').addEventListener('click', () => {
+                searchInput.value = '';
+                clearFilters();
+                searchInput.focus();
+            });
+        }
+        
+        // If there are multiple matches including the search term in the element's symbol,
+        // visually highlight these symbol matches
+        if (matchCount > 1 && !exactMatch) {
+            document.querySelectorAll('.element.filtered-in:not([data-is-marker="true"])').forEach(el => {
+                const symbol = el.querySelector('.symbol')?.textContent?.toLowerCase() || '';
+                if (symbol.includes(searchTerm)) {
+                    el.classList.add('symbol-match');
+                }
+            });
+        }
+    };
+      // Apply search on button click
+    searchBtn.addEventListener('click', handleSearch);
+    
+    // Create a debounced search function for real-time updates
+    const debouncedSearch = debounce(handleSearch, 300);
+    
+    // Apply search on input with real-time feedback
+    searchInput.addEventListener('input', (e) => {
+        // Reset all symbol-match classes when typing
+        document.querySelectorAll('.element').forEach(el => {
+            el.classList.remove('symbol-match');
+        });
+        
+        // Show quick feedback when typing before the debounced search happens
+        const quickSearchTerm = e.target.value.trim().toLowerCase();
+        if (quickSearchTerm) {
+            const searchIndicator = document.querySelector('.search-indicator') || 
+                (() => {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'search-indicator';
+                    document.querySelector('.search-box').appendChild(indicator);
+                    return indicator;
+                })();
+            searchIndicator.textContent = `Searching: ${quickSearchTerm}`;
+            searchIndicator.style.display = 'block';
+            
+            setTimeout(() => {
+                searchIndicator.style.display = 'none';
+            }, 300);
+        }
+        
+        // Run the debounced search
+        debouncedSearch(e);
+    });
+      // Handle special key events
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            // Immediate search on Enter key
+            handleSearch();
+            
+            // Select the first result or element with exact match
+            const exactMatch = document.querySelector('.element.exact-match');
+            const firstMatch = document.querySelector('.element.filtered-in:not([data-is-marker="true"])');
+            
+            if (exactMatch) {
+                exactMatch.focus();
+            } else if (firstMatch) {
+                firstMatch.focus();
+            }
         } else if (e.key === 'Escape') {
+            // Clear search on Escape key
             searchInput.value = '';
             clearFilters();
-        } else if (searchInput.value === '') {
-            // Clear filters if search box is emptied
-            clearFilters();
+        } else if (e.key === 'ArrowDown') {
+            // Navigate to the first search result on Arrow Down
+            const firstMatch = document.querySelector('.element.filtered-in:not([data-is-marker="true"])');
+            if (firstMatch) {
+                firstMatch.focus();
+            }
+        }
+    });
+    
+    // Add keyboard navigation between search results
+    document.addEventListener('keydown', (e) => {
+        // Only handle key navigation when we have search results
+        const hasFilteredElements = document.querySelector('.element.filtered-in:not([data-is-marker="true"])');
+        if (!hasFilteredElements) return;
+        
+        // Get the currently focused element
+        const focusedElement = document.activeElement;
+        
+        // Check if we're on an element and handle arrow keys
+        if (focusedElement.classList?.contains('element')) {
+            const allFilteredElements = Array.from(
+                document.querySelectorAll('.element.filtered-in:not([data-is-marker="true"])')
+            );
+            
+            const currentIndex = allFilteredElements.indexOf(focusedElement);
+            if (currentIndex === -1) return;
+            
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                // Move to next element
+                const nextIndex = (currentIndex + 1) % allFilteredElements.length;
+                allFilteredElements[nextIndex].focus();
+                e.preventDefault();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                // Move to previous element
+                const prevIndex = (currentIndex - 1 + allFilteredElements.length) % allFilteredElements.length;
+                allFilteredElements[prevIndex].focus();
+                e.preventDefault();
+            } else if (e.key === 'Enter') {
+                // Show details for the focused element
+                focusedElement.click();
+                e.preventDefault();
+            } else if (e.key === 'Escape') {
+                // Return focus to search input
+                searchInput.focus();
+                e.preventDefault();
+            }
         }
     });
     
@@ -689,20 +845,32 @@ function clearFilters() {
     document.getElementById('group-filter').value = 'all';
     document.getElementById('search-input').value = '';
     
+    // Hide search indicator if present
+    const searchIndicator = document.querySelector('.search-indicator');
+    if (searchIndicator) {
+        searchIndicator.style.display = 'none';
+    }
+    
     // Show all elements and clear special classes
     document.querySelectorAll('.element').forEach(el => {
-        // Remove filter classes
+        // Remove all filter and search-related classes
         el.classList.remove('filtered-out');
         el.classList.remove('filtered-in');
         el.classList.remove('exact-match');
         el.classList.remove('highlighted');
+        el.classList.remove('symbol-match');
         
-        // For marker blocks, ensure they're properly visible and don't have any filter-related classes
+        // For marker blocks, ensure they're properly visible
         if (el.dataset.isMarker === 'true') {
             el.style.display = ''; // Reset display to default
             el.classList.remove('filtered-out');
             el.classList.remove('filtered-in');
         }
+        
+        // Remove any inline styles that might have been added
+        if (el.style.opacity !== '') el.style.removeProperty('opacity');
+        if (el.style.transform !== '') el.style.removeProperty('transform');
+        if (el.style.filter !== '') el.style.removeProperty('filter');
     });
     
     // Hide the filter count

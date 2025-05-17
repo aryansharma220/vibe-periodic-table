@@ -11,9 +11,10 @@
     </header>
     
     <div class="controls-container">        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Search by name, symbol, or number">
-            <button id="clear-search" class="clear-btn" title="Clear search">&times;</button>
-            <button id="search-btn">Search</button>
+            <label for="search-input" class="sr-only">Search elements</label>
+            <input type="text" id="search-input" placeholder="Search by name, symbol, or number" aria-label="Search elements by name, symbol, number, or other properties">
+            <button id="clear-search" class="clear-btn" title="Clear search" aria-label="Clear search">&times;</button>
+            <button id="search-btn" aria-label="Submit search">Search</button>
         </div>
         
         <div class="filters">
@@ -74,7 +75,7 @@
     </div>
 
     <footer>
-        <p>Data provided by <a href="https://github.com/Bowserinator/Periodic-Table-JSON" target="_blank">Periodic-Table-JSON</a></p>
+        <p>Data provided by <a href="https://github.com/Bowserinator/Periodic-Table-JSON" target="_blank" rel="noopener noreferrer">Periodic-Table-JSON</a></p>
     </footer>
 
     <script src="js/app.js"></script>
