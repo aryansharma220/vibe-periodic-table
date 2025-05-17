@@ -1,88 +1,85 @@
-import React, { useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { motion } from 'framer-motion';
-import gsap from 'gsap';
-import { getNeonColor } from '../utils/elementUtils';
+import React, { useRef, useEffect } from "react";
+import PropTypes from "prop-types";
+import { motion } from "framer-motion";
+import gsap from "gsap";
+import { getNeonColor } from "../utils/elementUtils";
 
-/**
- * ElementCard component displays a single element in the periodic table grid
- */
-function ElementCard({ element, onMouseEnter, onMouseLeave, onClick, isFiltered = true }) {
-  // Get neon color for this element
+function ElementCard({
+  element,
+  onMouseEnter,
+  onMouseLeave,
+  onClick,
+  isFiltered = true,
+}) {
   const neonColor = getNeonColor(element.category);
-    // Add entrance animation when component mounts and subtle glow effect
   useEffect(() => {
-    // Create a staggered entrance animation
     gsap.fromTo(
       cardRef.current,
-      { 
-        opacity: 0, 
-        scale: 0.8, 
-        boxShadow: 'none',
-        y: 10
+      {
+        opacity: 0,
+        scale: 0.8,
+        boxShadow: "none",
+        y: 10,
       },
-      { 
-        opacity: 1, 
+      {
+        opacity: 1,
         scale: 1,
         y: 0,
-        boxShadow: isFiltered ? `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}` : 'none',
+        boxShadow: isFiltered
+          ? `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}`
+          : "none",
         duration: 0.6,
-        delay: 0.05 * element.number % 0.5, // Staggered delay based on atomic number
-        ease: "power3.out"
+        delay: (0.05 * element.number) % 0.5,
+        ease: "power3.out",
       }
     );
-    
-    // If the element is filtered, add a subtle pulsing glow effect
+
     if (isFiltered) {
       const pulseTimeline = gsap.timeline({
-        repeat: -1, 
-        yoyo: true, 
+        repeat: -1,
+        yoyo: true,
         repeatDelay: 0.5,
-        delay: Math.random() * 2 // Random start time for each element
+        delay: Math.random() * 2,
       });
-      
+
       pulseTimeline.to(cardRef.current, {
         boxShadow: `0 0 8px ${neonColor}, inset 0 0 5px ${neonColor}`,
         duration: 1.5,
-        ease: "sine.inOut"
+        ease: "sine.inOut",
       });
-      
-      // Subtle text shadow pulsing for the symbol
+
       gsap.to(symbolRef.current, {
         textShadow: `0 0 6px ${neonColor}, 0 0 8px ${neonColor}`,
         repeat: -1,
         yoyo: true,
         duration: 2,
         delay: Math.random(),
-        ease: "sine.inOut"
+        ease: "sine.inOut",
       });
     }
-    
-    // Cleanup the animations when component unmounts
+
     return () => {
       gsap.killTweensOf(cardRef.current);
       gsap.killTweensOf(symbolRef.current);
     };
   }, [isFiltered, element.number, neonColor]);
 
-  // Apply different styles based on filter state
   const elementStyle = isFiltered
     ? `backdrop-blur-md bg-white/10 dark:bg-black/20 border z-10 rounded-lg`
     : `bg-gray-100/10 dark:bg-gray-800/10 border opacity-30 z-0 rounded-lg`;
   const textStyle = isFiltered
-    ? 'text-gray-800 dark:text-white'
-    : 'text-gray-500 dark:text-gray-600';
-      // Refs for GSAP animations
+    ? "text-gray-800 dark:text-white"
+    : "text-gray-500 dark:text-gray-600";
+
   const cardRef = useRef(null);
   const symbolRef = useRef(null);
   const numberRef = useRef(null);
-    
-  // Symbol animation variants
+
   const symbolVariants = {
     initial: {
       scale: 1,
       opacity: 1,
-      y: 0
+      y: 0,
     },
     hover: {
       scale: 1.15,
@@ -91,21 +88,20 @@ function ElementCard({ element, onMouseEnter, onMouseLeave, onClick, isFiltered 
       transition: {
         type: "spring",
         stiffness: 500,
-        damping: 15
-      }
-    }
+        damping: 15,
+      },
+    },
   };
-    
-    // Animation variants for Framer Motion
+
   const cardVariants = {
-    initial: { 
+    initial: {
       scale: 1,
-      rotate: 0
+      rotate: 0,
     },
     hover: {
       scale: 1.1,
       zIndex: 20,
-      rotate: isFiltered ? [0, 0.5, 0] : 0, // subtle rotation effect when filtered
+      rotate: isFiltered ? [0, 0.5, 0] : 0,
       transition: {
         type: "spring",
         stiffness: 400,
@@ -113,97 +109,88 @@ function ElementCard({ element, onMouseEnter, onMouseLeave, onClick, isFiltered 
         rotate: {
           repeat: 0,
           duration: 0.5,
-          ease: "easeInOut"
-        }
-      }
+          ease: "easeInOut",
+        },
+      },
     },
     tap: {
       scale: 0.95,
       transition: {
         type: "spring",
         stiffness: 400,
-        damping: 15
-      }
-    }
+        damping: 15,
+      },
+    },
   };
-    // Handle mouse enter with GSAP
+
   const handleMouseEnter = (e) => {
     if (!isFiltered) return;
-    
-    // Run the passed onMouseEnter function
+
     if (onMouseEnter) {
       onMouseEnter(e);
     }
-    
-    // GSAP animations with smooth transitions
+
     gsap.to(symbolRef.current, {
       textShadow: `0 0 10px ${neonColor}, 0 0 15px ${neonColor}, 0 0 20px ${neonColor}`,
       scale: 1.05,
       duration: 0.4,
-      ease: "power2.out"
+      ease: "power2.out",
     });
-    
+
     gsap.to(cardRef.current, {
       boxShadow: `0 0 15px ${neonColor}, 0 0 25px ${neonColor}, inset 0 0 8px ${neonColor}`,
       borderColor: neonColor,
       duration: 0.4,
-      ease: "power2.out"
+      ease: "power2.out",
     });
   };
-    // Handle mouse leave with GSAP
   const handleMouseLeave = (e) => {
     if (!isFiltered) return;
-    
-    // Run the passed onMouseLeave function
+
     if (onMouseLeave) {
       onMouseLeave(e);
     }
-    
-    // GSAP animations with smooth transitions
+
     gsap.to(symbolRef.current, {
       textShadow: `0 0 4px ${neonColor}, 0 0 6px ${neonColor}`,
       scale: 1,
       duration: 0.5,
-      ease: "power2.out"
+      ease: "power2.out",
     });
-    
+
     gsap.to(cardRef.current, {
       boxShadow: `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}`,
       borderColor: neonColor,
       duration: 0.5,
-      ease: "power2.out"
+      ease: "power2.out",
     });
   };
-  // Handle click with a pulse animation
   const handleClick = (e) => {
     if (!isFiltered || !onClick) return;
-    
-    // Create a more elaborate click effect
+
     const tl = gsap.timeline();
-    
-    // Card animation
+
     tl.to(cardRef.current, {
       scale: 0.92,
       duration: 0.1,
       ease: "power1.inOut",
       boxShadow: `0 0 20px ${neonColor}, 0 0 30px ${neonColor}, inset 0 0 12px ${neonColor}`,
-      borderWidth: "2px"
-    })
-    .to(cardRef.current, {
+      borderWidth: "2px",
+    }).to(cardRef.current, {
       scale: 1,
       duration: 0.3,
       ease: "elastic.out(1.2, 0.5)",
       boxShadow: `0 0 10px ${neonColor}, inset 0 0 6px ${neonColor}`,
-      borderWidth: "1px"
+      borderWidth: "1px",
     });
-    
-    // Symbol animation with glow pulse
-    gsap.timeline()
+
+    gsap
+      .timeline()
       .to(symbolRef.current, {
         scale: 0.9,
         duration: 0.1,
         ease: "power1.inOut",
-        textShadow: `0 0 12px ${neonColor}, 0 0 18px ${neonColor}, 0 0 24px ${neonColor}`
+        textShadow: `0 0 12px ${neonColor}, 0 0 18px ${neonColor}, 0 0 24px ${neonColor}`,
       })
       .to(symbolRef.current, {
         scale: 1.1,
@@ -214,22 +201,20 @@ function ElementCard({ element, onMouseEnter, onMouseLeave, onClick, isFiltered 
         scale: 1.05,
         duration: 0.15,
         ease: "power2.out",
-        textShadow: `0 0 8px ${neonColor}, 0 0 12px ${neonColor}, 0 0 16px ${neonColor}`
+        textShadow: `0 0 8px ${neonColor}, 0 0 12px ${neonColor}, 0 0 16px ${neonColor}`,
       });
-    
-    // Create a flash effect on the border
+
     gsap.to(cardRef.current, {
-      borderColor: '#ffffff', 
+      borderColor: "#ffffff",
       duration: 0.1,
       onComplete: () => {
         gsap.to(cardRef.current, {
           borderColor: neonColor,
-          duration: 0.3
+          duration: 0.3,
         });
-      }
+      },
     });
-    
-    // Call the original onClick handler
+
     onClick(e);
   };
   return (
@@ -246,42 +231,60 @@ function ElementCard({ element, onMouseEnter, onMouseLeave, onClick, isFiltered 
       style={{
         gridColumn: element.xpos,
         gridRow: element.ypos,
-        backdropFilter: isFiltered ? 'blur(8px)' : 'none',
-        WebkitBackdropFilter: isFiltered ? 'blur(8px)' : 'none',
-        borderColor: isFiltered ? `${neonColor}` : 'rgba(255,255,255,0.1)',
-        boxShadow: isFiltered ? `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}` : 'none',
-        background: isFiltered ? `radial-gradient(circle at center, ${neonColor}10 0%, transparent 70%)` : 'none',
-        transition: 'box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease, background 0.3s ease'
-      }}    >      <motion.div 
+        backdropFilter: isFiltered ? "blur(8px)" : "none",
+        WebkitBackdropFilter: isFiltered ? "blur(8px)" : "none",
+        borderColor: isFiltered ? `${neonColor}` : "rgba(255,255,255,0.1)",
+        boxShadow: isFiltered
+          ? `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}`
+          : "none",
+        background: isFiltered
+          ? `radial-gradient(circle at center, ${neonColor}10 0%, transparent 70%)`
+          : "none",
+        transition:
+          "box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease, background 0.3s ease",
+      }}
+    >
+      {" "}
+      <motion.div
         ref={numberRef}
         className="text-xs text-left"
         animate={{ opacity: 1 }}
         initial={{ opacity: 0.7 }}
-        whileHover={isFiltered ? { 
-          opacity: 1, 
-          scale: 1.2, 
-          x: 1,
-          transition: { duration: 0.2 }
-        } : {}}
+        whileHover={
+          isFiltered
+            ? {
+                opacity: 1,
+                scale: 1.2,
+                x: 1,
+                transition: { duration: 0.2 },
+              }
+            : {}
+        }
         transition={{ duration: 0.2 }}
       >
         <span>{element.number}</span>
       </motion.div>
-      <div className="text-center mt-auto">        <motion.div 
+      <div className="text-center mt-auto">
+        {" "}
+        <motion.div
           ref={symbolRef}
           className={`${isFiltered ? "text-2xl font-normal" : "text-xl"}`}
           variants={symbolVariants}
           initial="initial"
           whileHover={isFiltered ? "hover" : ""}
           style={{
-            textShadow: isFiltered ? `0 0 4px ${neonColor}, 0 0 6px ${neonColor}` : 'none',
-            letterSpacing: '0.03em',
-            transition: 'text-shadow 0.3s ease, transform 0.3s ease, color 0.3s ease'
+            textShadow: isFiltered
+              ? `0 0 4px ${neonColor}, 0 0 6px ${neonColor}`
+              : "none",
+            letterSpacing: "0.03em",
+            transition:
+              "text-shadow 0.3s ease, transform 0.3s ease, color 0.3s ease",
           }}
         >
           {element.symbol}
         </motion.div>
-      </div>    </motion.div>
+      </div>{" "}
+    </motion.div>
   );
 }
 
@@ -292,12 +295,12 @@ ElementCard.propTypes = {
     name: PropTypes.string.isRequired,
     category: PropTypes.string,
     xpos: PropTypes.number.isRequired,
-    ypos: PropTypes.number.isRequired
+    ypos: PropTypes.number.isRequired,
   }).isRequired,
   isFiltered: PropTypes.bool,
   onMouseEnter: PropTypes.func,
   onMouseLeave: PropTypes.func,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
 };
 
 export default ElementCard;

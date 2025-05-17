@@ -7,17 +7,18 @@
  */
 export const getNeonColor = (category) => {
   const colors = {
-    'noble gas': 'purple',
-    'alkali metal': 'red',
-    'alkaline earth metal': 'orange',
-    'transition metal': 'yellow',
-    'post-transition metal': 'green',
-    'metalloid': 'teal',    'nonmetal': 'blue',
-    'halogen': 'indigo',
-    'lanthanide': 'pink',
-    'actinide': 'fuchsia',
-    'unknown': 'gray',
+    "noble gas": "purple",
+    "alkali metal": "red",
+    "alkaline earth metal": "orange",
+    "transition metal": "gold",
+    "post-transition metal": "green",
+    "metalloid": "teal",
+    "nonmetal": "blue",
+    "halogen": "indigo",
+    "lanthanide": "pink",
+    "actinide": "fuchsia",
+    unknown: "gray",
   };
 
-  return colors[category?.toLowerCase()] || 'gray';
+  return colors[category?.toLowerCase()] || "gray";
 };
