@@ -98,10 +98,9 @@ function ElementDetailsModal({ element, onClose }) {
       animate="visible"
       variants={backdropVariants}
     >
-      {" "}
-      <div
+      {" "}      <div
         ref={modalRef}
-        className="backdrop-blur-md rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto text-gray-800 dark:text-white"
+        className="backdrop-blur-md rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto text-gray-800 dark:text-white custom-scrollbar"
         style={{
           background:
             "linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(24,24,27,0.07) 100%)",
@@ -115,6 +114,8 @@ function ElementDetailsModal({ element, onClose }) {
           borderRight: `1.5px solid ${neonColor}50`,
           borderBottom: `1.5px solid ${neonColor}50`,
           boxShadow: `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px ${neonColor}60, inset 0 0 8px ${neonColor}40`,
+          scrollbarWidth: 'thin',
+          scrollbarColor: `${neonColor}80 rgba(10, 10, 15, 0.1)`,
         }}
       >
         {" "}
