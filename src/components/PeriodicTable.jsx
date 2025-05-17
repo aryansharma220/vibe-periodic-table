@@ -47,28 +47,33 @@ function PeriodicTable() {
     
     let result = [...elements];
     
-    // Apply search filter
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      result = result.filter(element => 
-        element.name.toLowerCase().includes(searchLower) ||
-        element.symbol.toLowerCase().includes(searchLower) ||
-        String(element.number).includes(searchTerm)
-      );
-    }
+    // Check if any filter is active
+    const isFilterActive = searchTerm || filterCategory || filterState;
     
-    // Apply category filter
-    if (filterCategory) {
-      result = result.filter(element => 
-        element.category.toLowerCase() === filterCategory.toLowerCase()
-      );
-    }
-    
-    // Apply state filter (solid, liquid, gas)
-    if (filterState) {
-      result = result.filter(element => 
-        element.phase.toLowerCase() === filterState.toLowerCase()
-      );
+    if (isFilterActive) {
+      // Apply search filter
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        result = result.filter(element => 
+          element.name.toLowerCase().includes(searchLower) ||
+          element.symbol.toLowerCase().includes(searchLower) ||
+          String(element.number).includes(searchTerm)
+        );
+      }
+      
+      // Apply category filter
+      if (filterCategory) {
+        result = result.filter(element => 
+          element.category.toLowerCase() === filterCategory.toLowerCase()
+        );
+      }
+      
+      // Apply state filter (solid, liquid, gas)
+      if (filterState) {
+        result = result.filter(element => 
+          element.phase.toLowerCase() === filterState.toLowerCase()
+        );
+      }
     }
     
     setFilteredElements(result);
@@ -203,24 +208,30 @@ function PeriodicTable() {
           </div>
         </div>
       </div>
-      
-      {/* Periodic Table Grid */}
+        {/* Periodic Table Grid */}
       <div className="grid grid-cols-18 gap-1 max-w-[1200px] mx-auto">
-        {filteredElements.map(element => (
-          <ElementCard 
-            key={element.number} 
-            element={element}
-            onMouseEnter={(e) => {
-              setHoveredElement(element);
-              setMousePosition({ 
-                x: e.clientX + 15, 
-                y: e.clientY - 10 
-              });
-            }}
-            onMouseLeave={() => setHoveredElement(null)}
-            onClick={() => setSelectedElement(element)}
-          />
-        ))}
+        {elements.map(element => {
+          const isFiltered = searchTerm || filterCategory || filterState 
+            ? filteredElements.some(e => e.number === element.number)
+            : true;
+            
+          return (
+            <ElementCard 
+              key={element.number} 
+              element={element}
+              isFiltered={isFiltered}
+              onMouseEnter={(e) => {
+                setHoveredElement(element);
+                setMousePosition({ 
+                  x: e.clientX + 15, 
+                  y: e.clientY - 10 
+                });
+              }}
+              onMouseLeave={() => setHoveredElement(null)}
+              onClick={() => setSelectedElement(element)}
+            />
+          );
+        })}
       </div>
       
       {/* Element Category Legend */}
@@ -232,8 +243,7 @@ function PeriodicTable() {
           element={selectedElement} 
           onClose={() => setSelectedElement(null)} 
         />
-      )}
-        {/* Tooltip for hover info */}
+      )}      {/* Tooltip for hover info */}
       {hoveredElement && (
         <div 
           ref={tooltipRef}
@@ -262,7 +272,7 @@ function PeriodicTable() {
 }
 
 // Element Card Component
-function ElementCard({ element, onMouseEnter, onMouseLeave, onClick }) {
+function ElementCard({ element, onMouseEnter, onMouseLeave, onClick, isFiltered = true }) {
   // Get category color
   const getCategoryColor = (category) => {
     const categoryColors = {
@@ -282,20 +292,29 @@ function ElementCard({ element, onMouseEnter, onMouseLeave, onClick }) {
     return categoryColors[category?.toLowerCase()] || 'bg-gray-200 dark:bg-gray-600';
   };
   
+  // Apply different styles based on filter state
+  const elementStyle = isFiltered
+    ? `${getCategoryColor(element.category)} border-2 border-gray-400 dark:border-gray-500 shadow-md z-10`
+    : `bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 opacity-30 z-0`;
+    
+  const textStyle = isFiltered
+    ? 'text-gray-800 dark:text-gray-200'
+    : 'text-gray-500 dark:text-gray-600';
+    
   return (
     <div 
-      className={`${getCategoryColor(element.category)} border border-gray-300 dark:border-gray-600 p-2 min-h-16 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-shadow text-gray-800 dark:text-gray-200`}
+      className={`${elementStyle} p-2 min-h-16 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-all duration-300 ${textStyle}`}
       onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      onMouseEnter={isFiltered ? onMouseEnter : null}
+      onMouseLeave={isFiltered ? onMouseLeave : null}
       style={{ gridColumn: element.xpos, gridRow: element.ypos }}
     >
       <div className="flex justify-between text-xs">
         <span>{element.number}</span>
-        <span className="font-semibold">{element.atomic_mass.toFixed(2)}</span>
+        <span className={isFiltered ? "font-semibold" : ""}>{element.atomic_mass.toFixed(2)}</span>
       </div>
       <div className="text-center">
-        <div className="text-xl font-bold">{element.symbol}</div>
+        <div className={`${isFiltered ? "text-xl font-bold" : "text-lg"}`}>{element.symbol}</div>
         <div className="text-xs truncate">{element.name}</div>
       </div>
     </div>
