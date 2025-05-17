@@ -13,8 +13,8 @@ function CategoryLegend() {
     { name: 'Metalloid', color: 'teal' },
     { name: 'Nonmetal', color: 'blue' },
     { name: 'Halogen', color: 'indigo' },
-    { name: 'Lanthanoid', color: 'pink' },
-    { name: 'Actinoid', color: 'rose' },
+    { name: 'Lanthanide', color: 'pink' },
+    { name: 'Actinide', color: 'fuchsia' },
   ];
   
   return (

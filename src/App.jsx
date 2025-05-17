@@ -7,9 +7,9 @@ import { useEffect, useRef, useState } from 'react';
 
 // Component for shooting star effect
 function ShootingStar() {
-  const duration = Math.random() * 4 + 2; // 2-6 second duration
-  const delay = Math.random() * 15;       // Random delay up to 15s
-  const size = Math.random() * 80 + 40;   // Trail length between 40-120px
+  const duration = Math.random() * 6 + 3; // 3-9 second duration (slower)
+  const delay = Math.random() * 45 + 15;  // Random delay between 15-60s (longer gap)
+  const size = Math.random() * 50 + 30;   // Trail length between 30-80px (shorter)
   const top = Math.random() * 70;         // Position in top 70% of screen
   const left = Math.random() * 30;        // Start position in left 30% of screen
   const angle = Math.random() * 60 - 30;  // Angle between -30 and 30 degrees
@@ -121,7 +121,7 @@ function App() {
   const gridRef = useRef(null);
   const [stars, setStars] = useState([]);
   const [largeStars] = useState(() => Array.from({ length: 7 }, (_, i) => i)); // 7 large twinkling stars
-  const [shootingStars] = useState(() => Array.from({ length: 5 }, (_, i) => i)); // 5 shooting stars
+  const [shootingStars] = useState(() => Array.from({ length: 3 }, (_, i) => i)); // 3 shooting stars (reduced from 5)
 
   // Initialize grid background and stars
   useEffect(() => {
@@ -173,10 +173,10 @@ function App() {
             transform: translateX(-100px);
             opacity: 0;
           }
-          5% {
+          10% {
             opacity: 1;
           }
-          95% {
+          90% {
             opacity: 1;
           }
           100% {

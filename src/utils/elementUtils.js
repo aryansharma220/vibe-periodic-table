@@ -12,11 +12,10 @@ export const getNeonColor = (category) => {
     'alkaline earth metal': 'orange',
     'transition metal': 'yellow',
     'post-transition metal': 'green',
-    'metalloid': 'teal',
-    'nonmetal': 'blue',
+    'metalloid': 'teal',    'nonmetal': 'blue',
     'halogen': 'indigo',
     'lanthanide': 'pink',
-    'actinoid': 'rose',
+    'actinide': 'fuchsia',
     'unknown': 'gray',
   };
 
