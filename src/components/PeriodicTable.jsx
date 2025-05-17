@@ -120,45 +120,59 @@ function PeriodicTable() {
 
   // Extract unique categories and phases for filters
   const uniqueCategories = [...new Set(elements.map(element => element.category))].sort();
-  const uniqueStates = [...new Set(elements.map(element => element.phase))].sort();
-  return (<div ref={wrapperRef} className="p-4 text-gray-800 dark:text-gray-200 pt-16 min-h-screen">      <div
+  const uniqueStates = [...new Set(elements.map(element => element.phase))].sort();  return (<div ref={wrapperRef} className="p-4 text-gray-800 dark:text-gray-200 pt-16 min-h-screen">      <div
     className="bg-white/5 dark:bg-black/20 backdrop-blur-md rounded-2xl py-6 px-4 mb-8 max-w-[1200px] mx-auto border border-cyan-500/20 shadow-lg"
     style={{
-      boxShadow: '0 0 3px rgba(0, 255, 255, 0.15)',
-      background: 'radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%)'
+      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2)',
+      background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(24,24,27,0.05) 100%)',
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
+      borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+      borderLeft: '1px solid rgba(255, 255, 255, 0.12)',
+      borderRight: '1px solid rgba(0, 0, 0, 0.1)',
+      borderBottom: '1px solid rgba(0, 0, 0, 0.1)'
     }}
-  >
-    <h1
+  >    <h1
       className="text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white"
       style={{
-        textShadow: '0 0 1px rgba(0, 255, 255, 0.2)'
+        textShadow: '0 1px 2px rgba(0, 0, 0, 0.1), 0 0 4px rgba(0, 255, 255, 0.2)',
+        letterSpacing: '0.5px'
       }}
     >
       Interactive Periodic Table
     </h1>
-    <p className="text-center text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+    <p className="text-center text-gray-600 dark:text-gray-300 max-w-2xl mx-auto" style={{ 
+        textShadow: '0 1px 1px rgba(0, 0, 0, 0.1)'
+      }}>
       Explore the chemical elements with this interactive periodic table featuring a glass design
     </p>
   </div>
-    {/* Search and Filter Controls */}      <div className="mb-8 max-w-[1200px] mx-auto">
-      <div className="bg-white/20 dark:bg-black/30 backdrop-blur-md p-5 rounded-xl shadow-lg border border-white/30 dark:border-white/10"
+    {/* Search and Filter Controls */}      <div className="mb-8 max-w-[1200px] mx-auto">      <div className="backdrop-blur-md p-5 rounded-xl shadow-lg"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.01) 100%)',
-          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.2)'
+          background: 'linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(24,24,27,0.06) 100%)',
+          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.12)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.15)'
         }}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">          {/* Search Box */}
           <div>
             <label htmlFor="search" className="block text-sm font-medium text-gray-800 dark:text-white mb-2">Search Elements</label>
-            <div className="relative">
-              <input
+            <div className="relative">              <input
                 type="text"
                 id="search"
                 placeholder="Search by name, symbol or atomic number"
-                className="w-full p-3 pl-10 border border-white/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent focus:outline-none bg-white/10 dark:bg-black/20 backdrop-blur-md text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="w-full p-3 pl-10 rounded-lg focus:ring-1 focus:ring-cyan-300/50 focus:border-transparent focus:outline-none backdrop-blur-md text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
-                  boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)'
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
                 }}
               />
               <div className="absolute left-3 top-3 text-gray-500 dark:text-gray-400">
@@ -170,15 +184,16 @@ function PeriodicTable() {
           </div>{/* Category Filter */}
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-gray-800 dark:text-white mb-2">Filter by Category</label>
-            <div className="relative">
-              <select
+            <div className="relative">              <select
                 id="category"
-                className="w-full p-3 border border-white/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent focus:outline-none bg-white/10 dark:bg-black/20 backdrop-blur-md text-gray-800 dark:text-white appearance-none cursor-pointer"
+                className="w-full p-3 rounded-lg focus:ring-1 focus:ring-cyan-300/50 focus:border-transparent focus:outline-none backdrop-blur-md text-gray-800 dark:text-white appearance-none cursor-pointer"
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
                 style={{
-                  backgroundImage: 'none',
-                  boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)'
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
                 }}
               >
                 <option value="" className="bg-white dark:bg-gray-800">All Categories</option>
@@ -202,15 +217,16 @@ function PeriodicTable() {
           {/* State Filter */}
           <div>
             <label htmlFor="state" className="block text-sm font-medium text-gray-800 dark:text-white mb-2">Filter by State</label>
-            <div className="relative">
-              <select
+            <div className="relative">              <select
                 id="state"
-                className="w-full p-3 border border-white/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent focus:outline-none bg-white/10 dark:bg-black/20 backdrop-blur-md text-gray-800 dark:text-white appearance-none cursor-pointer"
+                className="w-full p-3 rounded-lg focus:ring-1 focus:ring-cyan-300/50 focus:border-transparent focus:outline-none backdrop-blur-md text-gray-800 dark:text-white appearance-none cursor-pointer"
                 value={filterState}
                 onChange={(e) => setFilterState(e.target.value)}
                 style={{
-                  backgroundImage: 'none',
-                  boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)'
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
                 }}
               >
                 <option value="" className="bg-white dark:bg-gray-800">All States</option>

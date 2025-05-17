@@ -92,22 +92,37 @@ function ElementDetailsModal({ element, onClose }) {
       initial="hidden"
       animate="visible"
       variants={backdropVariants}
-    >
-      <div
+    >      <div
         ref={modalRef}
-        className="bg-white/10 dark:bg-black/20 backdrop-blur-md border rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto text-gray-800 dark:text-white"
+        className="backdrop-blur-md rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto text-gray-800 dark:text-white"
         style={{
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+          background: 'linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(24,24,27,0.07) 100%)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           borderColor: neonColor,
-          boxShadow: `0 0 15px ${neonColor}, inset 0 0 10px ${neonColor}`
+          borderWidth: '1.5px',
+          borderStyle: 'solid',
+          borderTop: `1.5px solid ${neonColor}80`,
+          borderLeft: `1.5px solid ${neonColor}80`,
+          borderRight: `1.5px solid ${neonColor}50`,
+          borderBottom: `1.5px solid ${neonColor}50`,
+          boxShadow: `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px ${neonColor}60, inset 0 0 8px ${neonColor}40`
         }}
       >        <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center gap-4">
-            <div 
+          <div className="flex items-center gap-4">            <div 
               ref={symbolRef}
-              className="bg-white/20 dark:bg-black/20 rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold"
-              style={{ position: 'relative' }}
+              className="rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold"
+              style={{ 
+                position: 'relative',
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(24,24,27,0.08) 100%)',
+                boxShadow: `0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.15), 0 0 10px ${neonColor}70`,
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                borderTop: `1px solid ${neonColor}40`,
+                borderLeft: `1px solid ${neonColor}40`,
+                borderRight: `1px solid rgba(0, 0, 0, 0.15)`,
+                borderBottom: `1px solid rgba(0, 0, 0, 0.15)`
+              }}
             >
               <motion.span
                 animate={{ 
@@ -162,21 +177,30 @@ function ElementDetailsModal({ element, onClose }) {
                 #{element.number} • {element.category}
               </motion.p>
             </div>
-          </div>
-          <motion.button
+          </div>          <motion.button
             onClick={onClose}
-            className="bg-white/20 dark:bg-black/20 rounded-full p-2 text-gray-700 dark:text-white hover:bg-white/30 dark:hover:bg-black/30 transition-colors"
+            className="rounded-full p-2 text-gray-700 dark:text-white transition-colors"
             whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRight: '1px solid rgba(0, 0, 0, 0.1)',
+              borderBottom: '1px solid rgba(0, 0, 0, 0.1)'
+            }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.15))' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </motion.button>
-        </div>        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <motion.div 
+        </div>        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">          <motion.div 
             ref={addToContentRefs}
-            className="bg-white/10 dark:bg-black/10 rounded-lg p-4 backdrop-blur-sm"
+            className="rounded-lg p-4 backdrop-blur-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -185,8 +209,21 @@ function ElementDetailsModal({ element, onClose }) {
               scale: 1.02,
               transition: { duration: 0.3 }
             }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(24,24,27,0.06) 100%)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRight: '1px solid rgba(0, 0, 0, 0.1)',
+              borderBottom: '1px solid rgba(0, 0, 0, 0.1)'
+            }}
           >
-            <h3 className="font-bold text-lg mb-2 border-b border-white/20 dark:border-white/10 pb-1">Physical Properties</h3>
+            <h3 className="font-bold text-lg mb-2 border-b border-white/20 dark:border-white/10 pb-1" 
+                style={{textShadow: '0 1px 1px rgba(0, 0, 0, 0.1)'}}>
+              Physical Properties
+            </h3>
             <div className="space-y-2">
               <p><span className="font-semibold">Atomic Number:</span> {element.number}</p>
               <p><span className="font-semibold">Atomic Mass:</span> {element.atomic_mass}</p>
@@ -197,7 +234,7 @@ function ElementDetailsModal({ element, onClose }) {
             </div>
           </motion.div>          <motion.div 
             ref={addToContentRefs}
-            className="bg-white/10 dark:bg-black/10 rounded-lg p-4 backdrop-blur-sm"
+            className="rounded-lg p-4 backdrop-blur-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -206,8 +243,21 @@ function ElementDetailsModal({ element, onClose }) {
               scale: 1.02,
               transition: { duration: 0.3 }
             }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(24,24,27,0.06) 100%)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRight: '1px solid rgba(0, 0, 0, 0.1)',
+              borderBottom: '1px solid rgba(0, 0, 0, 0.1)'
+            }}
           >
-            <h3 className="font-bold text-lg mb-2 border-b border-white/20 dark:border-white/10 pb-1">Electronic Properties</h3>
+            <h3 className="font-bold text-lg mb-2 border-b border-white/20 dark:border-white/10 pb-1"
+                style={{textShadow: '0 1px 1px rgba(0, 0, 0, 0.1)'}}>
+              Electronic Properties
+            </h3>
             <div className="space-y-2">
               <p><span className="font-semibold">Electron Configuration:</span> {element.electron_configuration}</p>
               <p><span className="font-semibold">Electronegativity:</span> {element.electronegativity_pauling}</p>
@@ -215,11 +265,34 @@ function ElementDetailsModal({ element, onClose }) {
               <p><span className="font-semibold">Named by:</span> {element.named_by || 'Unknown'}</p>
             </div>
           </motion.div>
-        </div>
-
-        <div className="mt-4 bg-white/10 dark:bg-black/10 rounded-lg p-4 backdrop-blur-sm">
-          <h3 className="font-bold text-lg mb-2 border-b border-white/20 dark:border-white/10 pb-1">Summary:</h3>
-          <p>{element.summary}</p>        </div>
+        </div>        <motion.div 
+          ref={addToContentRefs}
+          className="mt-4 rounded-lg p-4 backdrop-blur-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          whileHover={{ 
+            boxShadow: `0 0 15px ${neonColor}`, 
+            scale: 1.01,
+            transition: { duration: 0.3 }
+          }}
+          style={{
+            background: 'linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(24,24,27,0.06) 100%)',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRight: '1px solid rgba(0, 0, 0, 0.1)',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <h3 className="font-bold text-lg mb-2 border-b border-white/20 dark:border-white/10 pb-1" 
+              style={{textShadow: '0 1px 1px rgba(0, 0, 0, 0.1)'}}>
+            Summary:
+          </h3>
+          <p className="leading-relaxed" style={{textShadow: '0 0.5px 0.5px rgba(0, 0, 0, 0.05)'}}>{element.summary}</p>
+        </motion.div>
       </div>
     </motion.div>
   );
