@@ -10,30 +10,51 @@ function ElementCard({
   onMouseLeave,
   onClick,
   isFiltered = true,
-}) {
-  const neonColor = getNeonColor(element.category);
-  useEffect(() => {    gsap.fromTo(
-      cardRef.current,
-      {
-        opacity: 0,
-        scale: 0.8,
-        boxShadow: "none",
-        y: 15,
-        fontWeight: "400",
-      },
-      {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        fontWeight: isFiltered ? "500" : "400",
-        boxShadow: isFiltered
-          ? `0 0 8px ${neonColor}, inset 0 0 5px ${neonColor}, 0 4px 8px rgba(0,0,0,0.3)`
-          : "0 2px 4px rgba(0,0,0,0.1)",
-        duration: 0.6,
-        delay: (0.05 * element.number) % 0.5,
-        ease: "power3.out",
-      }
-    );
+  isInComparison = false,
+  comparisonMode = false,
+  style = {},
+}) {  const neonColor = getNeonColor(element.category);
+  
+  const cardRef = useRef(null);
+  const symbolRef = useRef(null);
+  const numberRef = useRef(null);
+  
+  useEffect(() => {    
+    // Special animation for comparison mode
+    if (isInComparison) {
+      gsap.to(cardRef.current, {
+        boxShadow: `0 0 15px ${neonColor}, 0 0 25px ${neonColor}`,
+        scale: 1.05,
+        borderColor: "#ffffff",
+        zIndex: 20,
+        yoyo: true,
+        repeat: -1,
+        repeatDelay: 2,
+        duration: 1.2
+      });    } else {
+      gsap.fromTo(
+        cardRef.current,
+        {
+          opacity: 0,
+          scale: 0.8,
+          boxShadow: "none",
+          y: 15,
+          fontWeight: "400",
+        },
+        {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          fontWeight: isFiltered ? "500" : "400",
+          boxShadow: isFiltered
+            ? `0 0 8px ${neonColor}, inset 0 0 5px ${neonColor}, 0 4px 8px rgba(0,0,0,0.3)`
+            : "0 2px 4px rgba(0,0,0,0.1)",
+          duration: 0.6,
+          delay: (0.05 * element.number) % 0.5,
+          ease: "power3.out",
+        }
+      );
+    }
 
     if (isFiltered) {
       const pulseTimeline = gsap.timeline({
@@ -64,17 +85,12 @@ function ElementCard({
       gsap.killTweensOf(symbolRef.current);
     };
   }, [isFiltered, element.number, neonColor]);
-
   const elementStyle = isFiltered
     ? `backdrop-blur-md bg-white/10 dark:bg-black/20 border z-10 rounded-lg`
     : `bg-gray-100/10 dark:bg-gray-800/10 border opacity-30 z-0 rounded-lg`;
   const textStyle = isFiltered
     ? "text-gray-800 dark:text-white"
     : "text-gray-500 dark:text-gray-600";
-
-  const cardRef = useRef(null);
-  const symbolRef = useRef(null);
-  const numberRef = useRef(null);
 
   const symbolVariants = {
     initial: {
@@ -123,7 +139,6 @@ function ElementCard({
       },
     },
   };
-
   const handleMouseEnter = (e) => {
     if (!isFiltered) return;
 
@@ -136,7 +151,9 @@ function ElementCard({
       scale: 1.05,
       duration: 0.4,
       ease: "power2.out",
-    });    gsap.to(cardRef.current, {
+    });
+    
+    gsap.to(cardRef.current, {
       boxShadow: `0 0 15px ${neonColor}, 0 0 25px ${neonColor}, inset 0 0 10px ${neonColor}, 0 10px 15px rgba(0,0,0,0.4)`,
       borderColor: neonColor,
       duration: 0.4,
@@ -149,25 +166,25 @@ function ElementCard({
 
     if (onMouseLeave) {
       onMouseLeave(e);
-    }
-
-    gsap.to(symbolRef.current, {
+    }    gsap.to(symbolRef.current, {
       textShadow: `0 0 4px ${neonColor}, 0 0 6px ${neonColor}`,
       scale: 1,
       duration: 0.5,
       ease: "power2.out",
-    });    gsap.to(cardRef.current, {
+    });
+    
+    gsap.to(cardRef.current, {
       boxShadow: `0 0 8px ${neonColor}, inset 0 0 5px ${neonColor}, 0 4px 8px rgba(0,0,0,0.3)`,
       borderColor: neonColor,
       fontWeight: "500",
       duration: 0.5,
       ease: "power2.out",
     });
-  };
-  const handleClick = (e) => {
+  };  const handleClick = (e) => {
     if (!isFiltered || !onClick) return;
 
-    const tl = gsap.timeline();    tl.to(cardRef.current, {
+    const tl = gsap.timeline();
+    tl.to(cardRef.current, {
       scale: 0.92,
       duration: 0.1,
       ease: "power1.inOut",
@@ -221,12 +238,12 @@ function ElementCard({
       ref={cardRef}
       className={`${elementStyle} p-1.5 min-h-14 flex flex-col justify-between cursor-pointer ${textStyle}`}
       onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnter}      onMouseLeave={handleMouseLeave}
       initial="initial"
       variants={cardVariants}
       whileHover={isFiltered ? "hover" : {}}
-      whileTap={isFiltered ? "tap" : {}}      style={{
+      whileTap={isFiltered ? "tap" : {}}
+      style={{
         gridColumn: element.xpos,
         gridRow: element.ypos,
         backdropFilter: isFiltered ? "blur(8px)" : "none",
@@ -241,6 +258,7 @@ function ElementCard({
         transition:
           "box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease, background 0.3s ease",
         fontWeight: isFiltered ? "500" : "400",
+        ...style
       }}
     >
       {" "}
@@ -262,10 +280,10 @@ function ElementCard({
         transition={{ duration: 0.2 }}
       >
         <span>{element.number}</span>
-      </motion.div>
-      <div className="text-center mt-auto">
+      </motion.div>      <div className="text-center mt-auto">
         {" "}
-        <motion.div          ref={symbolRef}
+        <motion.div
+          ref={symbolRef}
           className={`${isFiltered ? "text-2xl font-semibold" : "text-xl font-medium"}`}
           variants={symbolVariants}
           initial="initial"
@@ -278,10 +296,27 @@ function ElementCard({
             transition:
               "text-shadow 0.3s ease, transform 0.3s ease, color 0.3s ease, font-weight 0.3s ease",
           }}
-        >
-          {element.symbol}
+        >          {element.symbol}
         </motion.div>
-      </div>{" "}
+      </div>
+      
+      {/* Comparison mode indicator */}
+      {comparisonMode && isFiltered && (
+        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-purple-600 border border-white flex items-center justify-center shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+        </div>
+      )}
+      
+      {/* Selected for comparison indicator */}
+      {isInComparison && (
+        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-green-500 border border-white flex items-center justify-center shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -296,9 +331,12 @@ ElementCard.propTypes = {
     ypos: PropTypes.number.isRequired,
   }).isRequired,
   isFiltered: PropTypes.bool,
+  isInComparison: PropTypes.bool,
+  comparisonMode: PropTypes.bool,
   onMouseEnter: PropTypes.func,
   onMouseLeave: PropTypes.func,
   onClick: PropTypes.func,
+  style: PropTypes.object,
 };
 
 export default ElementCard;

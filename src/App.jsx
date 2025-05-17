@@ -1,6 +1,8 @@
 import PeriodicTable from "./components/PeriodicTable";
 import ThemeToggle from "./components/ThemeToggle";
+import ElementComparisonTool from "./components/ElementComparisonTool";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { ComparisonProvider } from "./contexts/ComparisonContext";
 import { useEffect, useRef, useState } from "react";
 
 // Component for shooting star effect
@@ -205,8 +207,9 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black dark:from-gray-950 dark:to-black transition-colors relative overflow-hidden">
-        {/* Grid background */}
+      <ComparisonProvider>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black dark:from-gray-950 dark:to-black transition-colors relative overflow-hidden">
+          {/* Grid background */}
         <div
           ref={gridRef}
           className="absolute inset-0 z-0 pointer-events-none"
@@ -251,8 +254,10 @@ function App() {
 
         <div className="relative z-10">
           <PeriodicTable />
+          <ElementComparisonTool />
         </div>
       </div>
+      </ComparisonProvider>
     </ThemeProvider>
   );
 }

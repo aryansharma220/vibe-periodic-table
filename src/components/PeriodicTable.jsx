@@ -2,7 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import ElementCard from "./ElementCard";
 import ElementDetailsModal from "./ElementDetailsModal";
 import CategoryLegend from "./CategoryLegend";
+import ElementComparisonTool from "./ElementComparisonTool";
+import ThemeToggle from "./ThemeToggle";
 import { getNeonColor } from "../utils/elementUtils";
+import { useComparison } from "../contexts/ComparisonContext";
 
 function PeriodicTable() {
   // State hooks
@@ -15,6 +18,16 @@ function PeriodicTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterState, setFilterState] = useState("");
+  
+  // Get comparison context
+  const { 
+    addToComparison, 
+    elementsToCompare,
+    comparisonMode,
+    toggleComparisonMode, 
+    openComparison,
+    clearComparison 
+  } = useComparison();
 
   // Refs
   const tooltipRef = useRef(null);
@@ -397,21 +410,114 @@ function PeriodicTable() {
               </button>
             )}
           </div>
+        </div>      </div>
+      
+      {/* Comparison controls */}
+      <div className="flex justify-between items-center max-w-[1300px] mx-auto px-5 py-2 mb-2">
+        <div className="flex items-center gap-2">
+          {/* Comparison mode toggle button */}
+          <button
+            onClick={toggleComparisonMode}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors
+              ${comparisonMode ? 
+                'bg-cyan-600 text-white hover:bg-cyan-700' : 
+                'bg-white/10 dark:bg-black/20 hover:bg-white/20 dark:hover:bg-black/30 text-gray-700 dark:text-gray-200'
+              } border border-white/30 dark:border-white/10 shadow-md`}
+            aria-label={comparisonMode ? "Exit comparison mode" : "Compare elements"}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            {comparisonMode ? "Exit Comparison" : "Compare Elements"}
+          </button>
+          
+          {comparisonMode && (
+            <div className="text-gray-600 dark:text-gray-300 text-sm">
+              Select up to 2 elements to compare
+            </div>
+          )}
         </div>
-      </div>{" "}
-      {/* Periodic Table Grid */}{" "}
+        
+        {/* Selected elements pills */}
+        <div className="flex items-center gap-2">
+          {elementsToCompare.length > 0 && (
+            <div className="flex items-center gap-2">
+              {elementsToCompare.map(element => (
+                <div 
+                  key={element.number}
+                  className="bg-white/20 dark:bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 border"
+                  style={{
+                    borderColor: getNeonColor(element.category),
+                    boxShadow: `0 0 5px ${getNeonColor(element.category)}`
+                  }}
+                >
+                  <span className="text-gray-800 dark:text-white font-medium">{element.symbol}</span>
+                  <button
+                    onClick={() => removeFromComparison(element.number)}
+                    className="ml-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
+                    aria-label={`Remove ${element.name} from comparison`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+              
+              {elementsToCompare.length > 1 && (
+                <button
+                  onClick={openComparison}
+                  className="px-3 py-1.5 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors shadow-md"
+                >
+                  Compare Now
+                </button>
+              )}
+              
+              {elementsToCompare.length > 0 && (
+                <button
+                  onClick={clearComparison}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
+                  aria-label="Clear comparison"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Periodic Table Grid */}
       <div className="grid grid-cols-18 gap-2.5 max-w-[1300px] mx-auto px-4">
         {elements.map((element) => {
           const isFiltered =
             searchTerm || filterCategory || filterState
               ? filteredElements.some((e) => e.number === element.number)
               : true;
+              
+          // Check if element is in comparison selection
+          const isInComparison = elementsToCompare.some(e => e.number === element.number);
 
           return (
             <ElementCard
               key={element.number}
               element={element}
               isFiltered={isFiltered}
+              isInComparison={isInComparison}
+              comparisonMode={comparisonMode}
               onMouseEnter={(e) => {
                 setHoveredElement(element);
                 setMousePosition({
@@ -420,7 +526,19 @@ function PeriodicTable() {
                 });
               }}
               onMouseLeave={() => setHoveredElement(null)}
-              onClick={() => setSelectedElement(element)}
+              onClick={() => {
+                if (comparisonMode) {
+                  addToComparison(element);
+                } else {
+                  setSelectedElement(element);
+                }
+              }}
+              style={isInComparison ? {
+                boxShadow: `0 0 15px ${getNeonColor(element.category)}, 0 0 25px ${getNeonColor(element.category)}`,
+                borderColor: '#ffffff',
+                transform: 'scale(1.1)',
+                zIndex: 20
+              } : {}}
             />
           );
         })}
@@ -470,12 +588,14 @@ function PeriodicTable() {
             <p className="backdrop-blur-sm bg-white/10 dark:bg-black/10 p-1.5 rounded">
               Category: {hoveredElement.category}
             </p>
-          </div>
-          <p className="text-xs mt-3 text-center font-medium text-gray-800 dark:text-white/80 bg-white/20 dark:bg-white/10 rounded-full py-1 px-3 inline-block">
-            Click for more details
+          </div>          <p className="text-xs mt-3 text-center font-medium text-gray-800 dark:text-white/80 bg-white/20 dark:bg-white/10 rounded-full py-1 px-3 inline-block">
+            {comparisonMode ? "Click to add to comparison" : "Click for more details"}
           </p>
         </div>
       )}
+      
+      {/* Element Comparison Tool */}
+      <ElementComparisonTool />
     </div>
   );
 }
