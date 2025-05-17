@@ -411,23 +411,29 @@ function PeriodicTable() {
             )}
           </div>
         </div>      </div>
-      
-      {/* Comparison controls */}
-      <div className="flex justify-between items-center max-w-[1300px] mx-auto px-5 py-2 mb-2">
-        <div className="flex items-center gap-2">
+        {/* Comparison controls */}
+      <div className="flex justify-between items-center max-w-[1300px] mx-auto px-5 py-4 mb-2">
+        <div className="flex items-center gap-3">
           {/* Comparison mode toggle button */}
           <button
             onClick={toggleComparisonMode}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors
+            className={`px-5 py-2.5 rounded-xl flex items-center gap-2.5 transition-all duration-300 transform hover:scale-105
               ${comparisonMode ? 
-                'bg-cyan-600 text-white hover:bg-cyan-700' : 
+                'bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700' : 
                 'bg-white/10 dark:bg-black/20 hover:bg-white/20 dark:hover:bg-black/30 text-gray-700 dark:text-gray-200'
-              } border border-white/30 dark:border-white/10 shadow-md`}
+              } border ${comparisonMode ? 'border-cyan-400/50' : 'border-white/30 dark:border-white/10'}`}
             aria-label={comparisonMode ? "Exit comparison mode" : "Compare elements"}
+            style={{
+              boxShadow: comparisonMode ? 
+                '0 0 15px rgba(6, 182, 212, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.3)' : 
+                '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)'
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
+              className={`h-5 w-5 ${comparisonMode ? 'text-white' : 'text-cyan-400 dark:text-cyan-300'}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -439,12 +445,19 @@ function PeriodicTable() {
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            {comparisonMode ? "Exit Comparison" : "Compare Elements"}
+            <span className="font-medium">
+              {comparisonMode ? "Exit Comparison" : "Compare Elements"}
+            </span>
           </button>
           
           {comparisonMode && (
-            <div className="text-gray-600 dark:text-gray-300 text-sm">
-              Select up to 2 elements to compare
+            <div className="text-gray-600 dark:text-gray-300 text-sm bg-white/10 dark:bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+              <span className="flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Select up to 2 elements to compare
+              </span>
             </div>
           )}
         </div>
@@ -474,11 +487,14 @@ function PeriodicTable() {
                   </button>
                 </div>
               ))}
-              
-              {elementsToCompare.length > 1 && (
+                {elementsToCompare.length > 1 && (
                 <button
                   onClick={openComparison}
-                  className="px-3 py-1.5 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors shadow-md"
+                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-blue-600 text-white hover:from-purple-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md backdrop-blur-md"
+                  style={{
+                    boxShadow: '0 0 10px rgba(124, 58, 237, 0.5)',
+                    border: '1px solid rgba(139, 92, 246, 0.3)'
+                  }}
                 >
                   Compare Now
                 </button>

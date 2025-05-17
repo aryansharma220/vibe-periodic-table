@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect } from "react";
 
 // Create Theme Context
 const ThemeContext = createContext();
@@ -8,28 +8,18 @@ export const useTheme = () => useContext(ThemeContext);
 
 // Theme Provider Component
 export const ThemeProvider = ({ children }) => {
-  // Check if dark mode is stored in localStorage or if user prefers dark mode
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem("dark-mode");
-    if (savedTheme !== null) {
-      return savedTheme === "true";
-    }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  });
+  // Always use dark mode, no state needed since it doesn't change
+  const darkMode = true;
 
-  // Effect to update HTML class when darkMode changes
+  // Effect to ensure dark mode class is added to HTML
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.setItem("dark-mode", darkMode);
-  }, [darkMode]);
+    document.documentElement.classList.add("dark");
+  }, []);
 
-  // Toggle function
+  // Empty toggle function that doesn't actually change the theme
   const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
+    // Does nothing - theme stays dark
+    console.log("Theme switching is disabled");
   };
 
   // Value object provided to context consumers
