@@ -136,11 +136,11 @@ function PeriodicTable() {
   // Extract unique categories and phases for filters
   const uniqueCategories = [...new Set(elements.map(element => element.category))].sort();
   const uniqueStates = [...new Set(elements.map(element => element.phase))].sort();
-
   return (    <div ref={wrapperRef} className="p-4 text-gray-800 dark:text-gray-200 pt-16 min-h-screen">      <div 
         className="bg-white/5 dark:bg-black/20 backdrop-blur-md rounded-2xl py-6 px-4 mb-8 max-w-[1200px] mx-auto border border-cyan-500/20 shadow-lg"
         style={{
-          boxShadow: '0 0 3px rgba(0, 255, 255, 0.15)'
+          boxShadow: '0 0 3px rgba(0, 255, 255, 0.15)',
+          background: 'radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%)'
         }}
       >
         <h1 
@@ -155,9 +155,12 @@ function PeriodicTable() {
           Explore the chemical elements with this interactive periodic table featuring a glass design
         </p>
       </div>
-        {/* Search and Filter Controls */}
-      <div className="mb-8 max-w-[1200px] mx-auto">
-        <div className="bg-white/20 dark:bg-black/30 backdrop-blur-md p-5 rounded-xl shadow-lg border border-white/30 dark:border-white/10">
+        {/* Search and Filter Controls */}      <div className="mb-8 max-w-[1200px] mx-auto">
+        <div className="bg-white/20 dark:bg-black/30 backdrop-blur-md p-5 rounded-xl shadow-lg border border-white/30 dark:border-white/10"
+             style={{
+               background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.01) 100%)',
+               boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.2)'
+             }}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search Box */}
             <div>
@@ -437,10 +440,13 @@ function CategoryLegend() {
     { name: 'Lanthanoid', color: 'pink' },
     { name: 'Actinoid', color: 'rose' },
   ];
-  
-  return (
+    return (
     <div className="mt-8 max-w-[1200px] mx-auto p-4">
-      <div className="bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-xl p-4 border border-white/30 dark:border-white/10 shadow-lg">
+      <div className="bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-xl p-4 border border-white/30 dark:border-white/10 shadow-lg"
+           style={{
+             background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+             boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.2)'
+           }}>
         <h3 className="text-center font-bold mb-3 text-gray-800 dark:text-white">Element Categories</h3>
         <div className="flex flex-wrap justify-center gap-3">
           {categories.map(category => (
