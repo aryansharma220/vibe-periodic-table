@@ -15,7 +15,7 @@ export const getNeonColor = (category) => {
     'metalloid': 'teal',
     'nonmetal': 'blue',
     'halogen': 'indigo',
-    'lanthanoid': 'pink',
+    'lanthanide': 'pink',
     'actinoid': 'rose',
     'unknown': 'gray',
   };

@@ -146,8 +146,7 @@ function PeriodicTable() {
           background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.01) 100%)',
           boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.2)'
         }}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Search Box */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">          {/* Search Box */}
           <div>
             <label htmlFor="search" className="block text-sm font-medium text-gray-800 dark:text-white mb-2">Search Elements</label>
             <div className="relative">
@@ -158,6 +157,9 @@ function PeriodicTable() {
                 className="w-full p-3 pl-10 border border-white/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent focus:outline-none bg-white/10 dark:bg-black/20 backdrop-blur-md text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)'
+                }}
               />
               <div className="absolute left-3 top-3 text-gray-500 dark:text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,25 +167,32 @@ function PeriodicTable() {
                 </svg>
               </div>
             </div>
-          </div>
-
-          {/* Category Filter */}
+          </div>{/* Category Filter */}
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-gray-800 dark:text-white mb-2">Filter by Category</label>
             <div className="relative">
               <select
                 id="category"
-                className="w-full p-3 border border-white/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent focus:outline-none bg-white/10 dark:bg-black/20 backdrop-blur-md text-gray-800 dark:text-white appearance-none"
+                className="w-full p-3 border border-white/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent focus:outline-none bg-white/10 dark:bg-black/20 backdrop-blur-md text-gray-800 dark:text-white appearance-none cursor-pointer"
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
+                style={{
+                  backgroundImage: 'none',
+                  boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)'
+                }}
               >
-                <option value="">All Categories</option>
+                <option value="" className="bg-white dark:bg-gray-800">All Categories</option>
                 {uniqueCategories.map(category => (
-                  <option key={category} value={category}>{category}</option>
+                  <option key={category} value={category} className="bg-white dark:bg-gray-800">{category}</option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <div 
+                className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400"
+                style={{ 
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05))'
+                }}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </div>
@@ -196,39 +205,54 @@ function PeriodicTable() {
             <div className="relative">
               <select
                 id="state"
-                className="w-full p-3 border border-white/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent focus:outline-none bg-white/10 dark:bg-black/20 backdrop-blur-md text-gray-800 dark:text-white appearance-none"
+                className="w-full p-3 border border-white/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent focus:outline-none bg-white/10 dark:bg-black/20 backdrop-blur-md text-gray-800 dark:text-white appearance-none cursor-pointer"
                 value={filterState}
                 onChange={(e) => setFilterState(e.target.value)}
+                style={{
+                  backgroundImage: 'none',
+                  boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)'
+                }}
               >
-                <option value="">All States</option>
+                <option value="" className="bg-white dark:bg-gray-800">All States</option>
                 {uniqueStates.map(state => (
-                  <option key={state} value={state}>{state}</option>
+                  <option key={state} value={state} className="bg-white dark:bg-gray-800">{state}</option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <div 
+                className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400"
+                style={{ 
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05))'
+                }}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Results count */}
+        </div>        {/* Results count */}
         <div className="mt-4 flex justify-between items-center">
           <div className="text-sm text-gray-800 dark:text-gray-200">
             Showing <span className="font-bold">{filteredElements.length}</span> of <span className="font-bold">{elements.length}</span> elements
           </div>
           {(searchTerm || filterCategory || filterState) && (
             <button
-              className="bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 transition-colors px-4 py-2 rounded-full text-gray-800 dark:text-white font-medium border border-white/30 dark:border-white/10"
+              className="bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 transition-all px-4 py-2 rounded-full text-gray-800 dark:text-white font-medium border border-white/30 dark:border-white/10"
+              style={{
+                boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)'
+              }}
               onClick={() => {
                 setSearchTerm('');
                 setFilterCategory('');
                 setFilterState('');
               }}
             >
-              Clear Filters
+              <div className="flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear Filters
+              </div>
             </button>
           )}
         </div>
