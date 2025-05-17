@@ -6,7 +6,7 @@ function ThemeToggle() {
   return (
     <button
       onClick={toggleDarkMode}
-      className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+      className="p-3 rounded-full backdrop-blur-md bg-white/20 dark:bg-black/20 hover:bg-white/30 dark:hover:bg-black/30 border border-white/30 dark:border-white/10 shadow-lg transition-all hover:scale-110"
       aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
       {darkMode ? (
