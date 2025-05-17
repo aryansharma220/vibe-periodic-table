@@ -12,22 +12,23 @@ function ElementCard({
   isFiltered = true,
 }) {
   const neonColor = getNeonColor(element.category);
-  useEffect(() => {
-    gsap.fromTo(
+  useEffect(() => {    gsap.fromTo(
       cardRef.current,
       {
         opacity: 0,
         scale: 0.8,
         boxShadow: "none",
-        y: 10,
+        y: 15,
+        fontWeight: "400",
       },
       {
         opacity: 1,
         scale: 1,
         y: 0,
+        fontWeight: isFiltered ? "500" : "400",
         boxShadow: isFiltered
-          ? `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}`
-          : "none",
+          ? `0 0 8px ${neonColor}, inset 0 0 5px ${neonColor}, 0 4px 8px rgba(0,0,0,0.3)`
+          : "0 2px 4px rgba(0,0,0,0.1)",
         duration: 0.6,
         delay: (0.05 * element.number) % 0.5,
         ease: "power3.out",
@@ -135,12 +136,11 @@ function ElementCard({
       scale: 1.05,
       duration: 0.4,
       ease: "power2.out",
-    });
-
-    gsap.to(cardRef.current, {
-      boxShadow: `0 0 15px ${neonColor}, 0 0 25px ${neonColor}, inset 0 0 8px ${neonColor}`,
+    });    gsap.to(cardRef.current, {
+      boxShadow: `0 0 15px ${neonColor}, 0 0 25px ${neonColor}, inset 0 0 10px ${neonColor}, 0 10px 15px rgba(0,0,0,0.4)`,
       borderColor: neonColor,
       duration: 0.4,
+      fontWeight: "600",
       ease: "power2.out",
     });
   };
@@ -156,11 +156,10 @@ function ElementCard({
       scale: 1,
       duration: 0.5,
       ease: "power2.out",
-    });
-
-    gsap.to(cardRef.current, {
-      boxShadow: `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}`,
+    });    gsap.to(cardRef.current, {
+      boxShadow: `0 0 8px ${neonColor}, inset 0 0 5px ${neonColor}, 0 4px 8px rgba(0,0,0,0.3)`,
       borderColor: neonColor,
+      fontWeight: "500",
       duration: 0.5,
       ease: "power2.out",
     });
@@ -168,20 +167,20 @@ function ElementCard({
   const handleClick = (e) => {
     if (!isFiltered || !onClick) return;
 
-    const tl = gsap.timeline();
-
-    tl.to(cardRef.current, {
+    const tl = gsap.timeline();    tl.to(cardRef.current, {
       scale: 0.92,
       duration: 0.1,
       ease: "power1.inOut",
-      boxShadow: `0 0 20px ${neonColor}, 0 0 30px ${neonColor}, inset 0 0 12px ${neonColor}`,
+      boxShadow: `0 0 20px ${neonColor}, 0 0 30px ${neonColor}, inset 0 0 12px ${neonColor}, 0 15px 20px rgba(0,0,0,0.5)`,
       borderWidth: "2px",
+      fontWeight: "700",
     }).to(cardRef.current, {
       scale: 1,
       duration: 0.3,
       ease: "elastic.out(1.2, 0.5)",
-      boxShadow: `0 0 10px ${neonColor}, inset 0 0 6px ${neonColor}`,
+      boxShadow: `0 0 12px ${neonColor}, inset 0 0 8px ${neonColor}, 0 6px 12px rgba(0,0,0,0.35)`,
       borderWidth: "1px",
+      fontWeight: "600",
     });
 
     gsap
@@ -227,21 +226,21 @@ function ElementCard({
       initial="initial"
       variants={cardVariants}
       whileHover={isFiltered ? "hover" : {}}
-      whileTap={isFiltered ? "tap" : {}}
-      style={{
+      whileTap={isFiltered ? "tap" : {}}      style={{
         gridColumn: element.xpos,
         gridRow: element.ypos,
         backdropFilter: isFiltered ? "blur(8px)" : "none",
         WebkitBackdropFilter: isFiltered ? "blur(8px)" : "none",
         borderColor: isFiltered ? `${neonColor}` : "rgba(255,255,255,0.1)",
         boxShadow: isFiltered
-          ? `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}`
-          : "none",
+          ? `0 0 8px ${neonColor}, inset 0 0 5px ${neonColor}, 0 4px 8px rgba(0,0,0,0.3)`
+          : "0 2px 4px rgba(0,0,0,0.1)",
         background: isFiltered
-          ? `radial-gradient(circle at center, ${neonColor}10 0%, transparent 70%)`
+          ? `radial-gradient(circle at center, ${neonColor}15 0%, transparent 70%)`
           : "none",
         transition:
           "box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease, background 0.3s ease",
+        fontWeight: isFiltered ? "500" : "400",
       }}
     >
       {" "}
@@ -266,19 +265,18 @@ function ElementCard({
       </motion.div>
       <div className="text-center mt-auto">
         {" "}
-        <motion.div
-          ref={symbolRef}
-          className={`${isFiltered ? "text-2xl font-normal" : "text-xl"}`}
+        <motion.div          ref={symbolRef}
+          className={`${isFiltered ? "text-2xl font-semibold" : "text-xl font-medium"}`}
           variants={symbolVariants}
           initial="initial"
           whileHover={isFiltered ? "hover" : ""}
           style={{
             textShadow: isFiltered
-              ? `0 0 4px ${neonColor}, 0 0 6px ${neonColor}`
-              : "none",
+              ? `0 0 4px ${neonColor}, 0 0 8px ${neonColor}, 0 2px 4px rgba(0, 0, 0, 0.5)`
+              : "0 1px 2px rgba(0, 0, 0, 0.3)",
             letterSpacing: "0.03em",
             transition:
-              "text-shadow 0.3s ease, transform 0.3s ease, color 0.3s ease",
+              "text-shadow 0.3s ease, transform 0.3s ease, color 0.3s ease, font-weight 0.3s ease",
           }}
         >
           {element.symbol}

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 // Component for shooting star effect
 function ShootingStar() {
   const duration = Math.random() * 6 + 3; // 3-9 second duration (slower)
-  const delay = Math.random() * 45 + 15; // Random delay between 15-60s (longer gap)
+  const delay = Math.random() * 5 + 2; // Random delay between 2-7s (much shorter initial delay)
   const size = Math.random() * 50 + 30; // Trail length between 30-80px (shorter)
   const top = Math.random() * 70; // Position in top 70% of screen
   const left = Math.random() * 30; // Start position in left 30% of screen
@@ -54,7 +54,7 @@ function StarParticle({ index }) {
   const initialX = Math.random() * 100;
   const initialY = Math.random() * 100;
   const speed = Math.random() * 15 + 5;
-  const delay = Math.random() * 10;
+  const delay = Math.random() * 5;
   const baseOpacity = Math.random() * 0.6 + 0.4; // Higher opacity range (0.4-1.0)
   const isPulse = Math.random() > 0.6; // 40% of stars will have a pulse effect
   const isExtraShiny = Math.random() > 0.8; // 20% will be extra shiny
@@ -92,7 +92,7 @@ function StarParticle({ index }) {
         animation: isPulse
           ? `float-${index % 3} ${speed}s infinite ease-in-out ${delay}s, ${
               isExtraShiny ? "shine" : "pulse"
-            } ${Math.random() * 3 + 2}s infinite ease-in-out ${delay}s`
+            } ${Math.random() * 1.5 + 0.8}s infinite ease-in-out ${delay}s`
           : `float-${index % 3} ${speed}s infinite ease-in-out ${delay}s`,
       }}
     />
@@ -104,8 +104,8 @@ function LargeStar({ index }) {
   const size = Math.random() * 2 + 4; // 4-6px size for larger stars
   const initialX = Math.random() * 100;
   const initialY = Math.random() * 100;
-  const twinkleSpeed = Math.random() * 4 + 3; // 3-7 second twinkle
-  const delay = Math.random() * 5;
+  const twinkleSpeed = Math.random() * 2 + 1.5; // 1.5-3.5 second twinkle (much faster)
+  const delay = Math.random() * 0.5; // Reduced delay
 
   return (
     <div
@@ -130,7 +130,7 @@ function App() {
   const [stars, setStars] = useState([]);
   const [largeStars] = useState(() => Array.from({ length: 7 }, (_, i) => i)); // 7 large twinkling stars
   const [shootingStars] = useState(() =>
-    Array.from({ length: 3 }, (_, i) => i)
+    Array.from({ length: 4 }, (_, i) => i)
   ); // 3 shooting stars (reduced from 5)
 
   // Initialize grid background and stars
@@ -166,17 +166,17 @@ function App() {
         }
         @keyframes pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(0.8); }
+          50% { opacity: 0.5; transform: scale(0.75); }
         }
         @keyframes shine {
           0%, 100% { opacity: 1; transform: scale(1); filter: brightness(1); }
-          50% { opacity: 1; transform: scale(1.2); filter: brightness(1.5); }
+          50% { opacity: 1; transform: scale(1.3); filter: brightness(1.8); }
         }
         @keyframes twinkle {
           0%, 100% { opacity: 1; transform: scale(1); }
-          25% { opacity: 0.5; transform: scale(0.8); }
-          50% { opacity: 1; transform: scale(1.1); filter: brightness(1.2); }
-          75% { opacity: 0.7; transform: scale(0.9); }
+          25% { opacity: 0.4; transform: scale(0.7); }
+          50% { opacity: 1; transform: scale(1.2); filter: brightness(1.4); }
+          75% { opacity: 0.6; transform: scale(0.85); }
         }
         @keyframes shooting-star {
           0% {
@@ -248,10 +248,6 @@ function App() {
         <div className="absolute top-1/4 left-1/4 w-20 h-20 rounded-full bg-gradient-to-r from-blue-500/5 to-purple-500/5 blur-2xl"></div>
         <div className="absolute bottom-1/3 right-1/3 w-24 h-24 rounded-full bg-gradient-to-r from-pink-500/5 to-red-500/5 blur-2xl"></div>
         <div className="absolute top-2/3 right-1/4 w-16 h-16 rounded-full bg-gradient-to-r from-green-500/5 to-emerald-500/5 blur-2xl"></div>
-
-        {/* <div className="fixed top-4 right-4 z-50">
-          <ThemeToggle />
-        </div> */}
 
         <div className="relative z-10">
           <PeriodicTable />
