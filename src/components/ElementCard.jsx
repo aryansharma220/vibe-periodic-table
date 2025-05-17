@@ -17,28 +17,33 @@ function ElementCard({ element, onMouseEnter, onMouseLeave, onClick, isFiltered 
   const textStyle = isFiltered
     ? 'text-gray-800 dark:text-white'
     : 'text-gray-500 dark:text-gray-600';
-
   return (
     <div
-      className={`${elementStyle} p-2 min-h-16 flex flex-col justify-between cursor-pointer hover:scale-105 transition-all duration-300 ${textStyle}`}
+      className={`${elementStyle} p-1.5 min-h-14 flex flex-col justify-between cursor-pointer hover:scale-105 transition-all duration-300 ${textStyle}`}
       onClick={onClick}
       onMouseEnter={isFiltered ? onMouseEnter : null}
-      onMouseLeave={isFiltered ? onMouseLeave : null}
-      style={{
+      onMouseLeave={isFiltered ? onMouseLeave : null}style={{
         gridColumn: element.xpos,
         gridRow: element.ypos,
         backdropFilter: isFiltered ? 'blur(8px)' : 'none',
         WebkitBackdropFilter: isFiltered ? 'blur(8px)' : 'none',
         borderColor: isFiltered ? `${neonColor}` : 'rgba(255,255,255,0.1)',
-        boxShadow: isFiltered ? `0 0 5px ${neonColor}, inset 0 0 5px ${neonColor}` : 'none',
-        textShadow: isFiltered ? `0 0 2px ${neonColor}` : 'none'
+        boxShadow: isFiltered ? `0 0 6px ${neonColor}, inset 0 0 4px ${neonColor}` : 'none',
+        background: isFiltered ? `radial-gradient(circle at center, ${neonColor}10 0%, transparent 70%)` : 'none'
       }}
-    >
-      <div className="text-xs text-left">
+    >      <div className="text-xs text-left">
         <span>{element.number}</span>
       </div>
       <div className="text-center mt-auto">
-        <div className={`${isFiltered ? "text-2xl font-bold" : "text-xl"}`}>{element.symbol}</div>
+        <div 
+          className={`${isFiltered ? "text-2xl font-normal" : "text-xl"}`} 
+          style={{
+            textShadow: isFiltered ? `0 0 4px ${neonColor}, 0 0 6px ${neonColor}` : 'none',
+            letterSpacing: '0.03em',
+          }}
+        >
+          {element.symbol}
+        </div>
       </div>
     </div>
   );

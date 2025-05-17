@@ -257,9 +257,7 @@ function PeriodicTable() {
           )}
         </div>
       </div>
-    </div>
-    {/* Periodic Table Grid */}
-    <div className="grid grid-cols-18 gap-1 max-w-[1200px] mx-auto">
+    </div>    {/* Periodic Table Grid */}    <div className="grid grid-cols-18 gap-2.5 max-w-[1300px] mx-auto px-4">
       {elements.map(element => {
         const isFiltered = searchTerm || filterCategory || filterState
           ? filteredElements.some(e => e.number === element.number)
