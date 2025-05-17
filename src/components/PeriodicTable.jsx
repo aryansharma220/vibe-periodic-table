@@ -105,28 +105,26 @@ function PeriodicTable() {
       return () => wrapper.removeEventListener('mouseleave', handleMouseLeave);
     }
   }, []);
-  
-  // Helper function to determine element background color based on category
+    // Helper function to determine element background color based on category
   const getCategoryColor = (category) => {
     const categoryColors = {
-      'noble gas': 'bg-purple-300',
-      'alkali metal': 'bg-red-300',
-      'alkaline earth metal': 'bg-orange-300',
-      'transition metal': 'bg-yellow-200',
-      'post-transition metal': 'bg-green-200',
-      'metalloid': 'bg-teal-200',
-      'nonmetal': 'bg-blue-200',
-      'halogen': 'bg-indigo-200',
-      'lanthanoid': 'bg-pink-200',
-      'actinoid': 'bg-rose-200',
-      'unknown': 'bg-gray-200',
+      'noble gas': 'bg-purple-300 dark:bg-purple-700',
+      'alkali metal': 'bg-red-300 dark:bg-red-700',
+      'alkaline earth metal': 'bg-orange-300 dark:bg-orange-700',
+      'transition metal': 'bg-yellow-200 dark:bg-yellow-600',
+      'post-transition metal': 'bg-green-200 dark:bg-green-700',
+      'metalloid': 'bg-teal-200 dark:bg-teal-700',
+      'nonmetal': 'bg-blue-200 dark:bg-blue-700',
+      'halogen': 'bg-indigo-200 dark:bg-indigo-700',
+      'lanthanoid': 'bg-pink-200 dark:bg-pink-700',
+      'actinoid': 'bg-rose-200 dark:bg-rose-700',
+      'unknown': 'bg-gray-200 dark:bg-gray-600',
     };
     
-    return categoryColors[category?.toLowerCase()] || 'bg-gray-200';
+    return categoryColors[category?.toLowerCase()] || 'bg-gray-200 dark:bg-gray-600';
   };
-
   // Loading and error states
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading periodic table data...</div>;
+  if (loading) return <div className="flex justify-center items-center h-screen text-gray-800 dark:text-gray-200">Loading periodic table data...</div>;
   if (error) return <div className="text-red-500 text-center">Error: {error}</div>;
   
   // Extract unique categories and phases for filters
@@ -134,21 +132,21 @@ function PeriodicTable() {
   const uniqueStates = [...new Set(elements.map(element => element.phase))].sort();
 
   return (
-    <div ref={wrapperRef} className="p-4">
+    <div ref={wrapperRef} className="p-4 text-gray-800 dark:text-gray-200 pt-16">
       <h1 className="text-3xl font-bold text-center mb-6">Interactive Periodic Table</h1>
       
       {/* Search and Filter Controls */}
       <div className="mb-6 max-w-[1200px] mx-auto">
-        <div className="bg-white p-4 rounded-lg shadow-md">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search Box */}
             <div>
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">Search Elements</label>
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search Elements</label>
               <input
                 type="text"
                 id="search"
                 placeholder="Search by name, symbol or atomic number"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none bg-white dark:bg-gray-700 dark:text-gray-200"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -156,10 +154,10 @@ function PeriodicTable() {
             
             {/* Category Filter */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Filter by Category</label>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Category</label>
               <select
                 id="category"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none bg-white dark:bg-gray-700 dark:text-gray-200"
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
               >
@@ -172,10 +170,10 @@ function PeriodicTable() {
             
             {/* State Filter */}
             <div>
-              <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">Filter by State</label>
+              <label htmlFor="state" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by State</label>
               <select
                 id="state"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none bg-white dark:bg-gray-700 dark:text-gray-200"
                 value={filterState}
                 onChange={(e) => setFilterState(e.target.value)}
               >
@@ -188,11 +186,11 @@ function PeriodicTable() {
           </div>
           
           {/* Results count */}
-          <div className="mt-3 text-sm text-gray-600">
+          <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
             Showing {filteredElements.length} of {elements.length} elements
             {(searchTerm || filterCategory || filterState) && (
               <button 
-                className="ml-2 text-blue-600 hover:text-blue-800 font-medium"
+                className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                 onClick={() => {
                   setSearchTerm('');
                   setFilterCategory('');
@@ -235,29 +233,28 @@ function PeriodicTable() {
           onClose={() => setSelectedElement(null)} 
         />
       )}
-      
-      {/* Tooltip for hover info */}
+        {/* Tooltip for hover info */}
       {hoveredElement && (
         <div 
           ref={tooltipRef}
-          className="fixed bg-white border border-gray-300 shadow-lg rounded-md p-3 z-50 w-64"
+          className="fixed bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-lg rounded-md p-3 z-50 w-64"
           style={{
             pointerEvents: 'none',
             transform: 'translate(0, -100%)',
             marginTop: '-10px'
           }}
         >
-          <div className="font-bold text-lg flex items-center gap-2">
+          <div className="font-bold text-lg flex items-center gap-2 text-gray-800 dark:text-gray-200">
             <span className={`w-4 h-4 inline-block ${getCategoryColor(hoveredElement.category)}`}></span>
             {hoveredElement.name} ({hoveredElement.symbol})
           </div>
-          <div className="grid grid-cols-2 gap-1 mt-1 text-sm">
+          <div className="grid grid-cols-2 gap-1 mt-1 text-sm text-gray-800 dark:text-gray-200">
             <p>Atomic #: {hoveredElement.number}</p>
             <p>Mass: {hoveredElement.atomic_mass.toFixed(2)}</p>
             <p>State: {hoveredElement.phase}</p>
             <p>Category: {hoveredElement.category}</p>
           </div>
-          <p className="text-xs mt-1 text-gray-600">Click for more details</p>
+          <p className="text-xs mt-1 text-gray-600 dark:text-gray-400">Click for more details</p>
         </div>
       )}
     </div>
@@ -269,25 +266,25 @@ function ElementCard({ element, onMouseEnter, onMouseLeave, onClick }) {
   // Get category color
   const getCategoryColor = (category) => {
     const categoryColors = {
-      'noble gas': 'bg-purple-300',
-      'alkali metal': 'bg-red-300',
-      'alkaline earth metal': 'bg-orange-300',
-      'transition metal': 'bg-yellow-200',
-      'post-transition metal': 'bg-green-200',
-      'metalloid': 'bg-teal-200',
-      'nonmetal': 'bg-blue-200',
-      'halogen': 'bg-indigo-200',
-      'lanthanoid': 'bg-pink-200',
-      'actinoid': 'bg-rose-200',
-      'unknown': 'bg-gray-200',
+      'noble gas': 'bg-purple-300 dark:bg-purple-700',
+      'alkali metal': 'bg-red-300 dark:bg-red-700',
+      'alkaline earth metal': 'bg-orange-300 dark:bg-orange-700',
+      'transition metal': 'bg-yellow-200 dark:bg-yellow-600',
+      'post-transition metal': 'bg-green-200 dark:bg-green-700',
+      'metalloid': 'bg-teal-200 dark:bg-teal-700',
+      'nonmetal': 'bg-blue-200 dark:bg-blue-700',
+      'halogen': 'bg-indigo-200 dark:bg-indigo-700',
+      'lanthanoid': 'bg-pink-200 dark:bg-pink-700',
+      'actinoid': 'bg-rose-200 dark:bg-rose-700',
+      'unknown': 'bg-gray-200 dark:bg-gray-600',
     };
     
-    return categoryColors[category?.toLowerCase()] || 'bg-gray-200';
+    return categoryColors[category?.toLowerCase()] || 'bg-gray-200 dark:bg-gray-600';
   };
   
   return (
     <div 
-      className={`${getCategoryColor(element.category)} border border-gray-300 p-2 min-h-16 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-shadow`}
+      className={`${getCategoryColor(element.category)} border border-gray-300 dark:border-gray-600 p-2 min-h-16 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-shadow text-gray-800 dark:text-gray-200`}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -309,12 +306,12 @@ function ElementCard({ element, onMouseEnter, onMouseLeave, onClick }) {
 function ElementDetailsModal({ element, onClose }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto text-gray-800 dark:text-gray-200">
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-2xl font-bold">{element.name} ({element.symbol})</h2>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-800"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -353,24 +350,24 @@ function ElementDetailsModal({ element, onClose }) {
 // Category Legend Component
 function CategoryLegend() {
   const categories = [
-    { name: 'Noble Gas', color: 'bg-purple-300' },
-    { name: 'Alkali Metal', color: 'bg-red-300' },
-    { name: 'Alkaline Earth Metal', color: 'bg-orange-300' },
-    { name: 'Transition Metal', color: 'bg-yellow-200' },
-    { name: 'Post-Transition Metal', color: 'bg-green-200' },
-    { name: 'Metalloid', color: 'bg-teal-200' },
-    { name: 'Nonmetal', color: 'bg-blue-200' },
-    { name: 'Halogen', color: 'bg-indigo-200' },
-    { name: 'Lanthanoid', color: 'bg-pink-200' },
-    { name: 'Actinoid', color: 'bg-rose-200' },
+    { name: 'Noble Gas', color: 'bg-purple-300 dark:bg-purple-700' },
+    { name: 'Alkali Metal', color: 'bg-red-300 dark:bg-red-700' },
+    { name: 'Alkaline Earth Metal', color: 'bg-orange-300 dark:bg-orange-700' },
+    { name: 'Transition Metal', color: 'bg-yellow-200 dark:bg-yellow-600' },
+    { name: 'Post-Transition Metal', color: 'bg-green-200 dark:bg-green-700' },
+    { name: 'Metalloid', color: 'bg-teal-200 dark:bg-teal-700' },
+    { name: 'Nonmetal', color: 'bg-blue-200 dark:bg-blue-700' },
+    { name: 'Halogen', color: 'bg-indigo-200 dark:bg-indigo-700' },
+    { name: 'Lanthanoid', color: 'bg-pink-200 dark:bg-pink-700' },
+    { name: 'Actinoid', color: 'bg-rose-200 dark:bg-rose-700' },
   ];
   
   return (
     <div className="mt-8 flex flex-wrap justify-center gap-2">
       {categories.map(category => (
         <div key={category.name} className="flex items-center">
-          <div className={`${category.color} w-4 h-4 mr-1 border border-gray-300`}></div>
-          <span className="text-xs">{category.name}</span>
+          <div className={`${category.color} w-4 h-4 mr-1 border border-gray-300 dark:border-gray-600`}></div>
+          <span className="text-xs text-gray-800 dark:text-gray-200">{category.name}</span>
         </div>
       ))}
     </div>
