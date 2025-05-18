@@ -210,53 +210,53 @@ function App() {
       <ComparisonProvider>
         <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black dark:from-gray-950 dark:to-black transition-colors relative overflow-hidden">
           {/* Grid background */}
-        <div
-          ref={gridRef}
-          className="absolute inset-0 z-0 pointer-events-none"
-          style={{
-            perspective: "1000px",
-            transformStyle: "preserve-3d",
-          }}
-        >
-          {/* Animated star particles */}
-          {stars.map((_, index) => (
-            <StarParticle key={`star-${index}`} index={index} />
-          ))}
+          <div
+            ref={gridRef}
+            className="absolute inset-0 z-0 pointer-events-none"
+            style={{
+              perspective: "1000px",
+              transformStyle: "preserve-3d",
+            }}
+          >
+            {/* Animated star particles */}
+            {stars.map((_, index) => (
+              <StarParticle key={`star-${index}`} index={index} />
+            ))}
 
-          {/* Special large twinkling stars */}
-          {largeStars.map((_, index) => (
-            <LargeStar key={`large-${index}`} index={index} />
-          ))}
+            {/* Special large twinkling stars */}
+            {largeStars.map((_, index) => (
+              <LargeStar key={`large-${index}`} index={index} />
+            ))}
 
-          {/* Shooting stars */}
-          {shootingStars.map((_, index) => (
-            <ShootingStar key={`shooting-${index}`} />
-          ))}
+            {/* Shooting stars */}
+            {shootingStars.map((_, index) => (
+              <ShootingStar key={`shooting-${index}`} />
+            ))}
+          </div>
+
+          {/* Decorative elements - neon glows */}
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+            {/* Color orbs */}
+            <div className="absolute -top-24 -left-24 w-96 h-96 bg-purple-500/10 dark:bg-purple-600/10 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/3 -right-24 w-72 h-72 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-32 left-1/3 w-80 h-80 bg-pink-500/10 dark:bg-pink-600/10 rounded-full blur-3xl"></div>
+
+            {/* Light beams */}
+            <div className="absolute top-0 left-1/4 w-1 h-64 bg-gradient-to-b from-cyan-400/20 to-transparent blur-md"></div>
+            <div className="absolute top-1/4 right-1/3 w-1 h-96 bg-gradient-to-b from-purple-400/20 to-transparent blur-md"></div>
+            <div className="absolute top-10 left-2/3 w-1 h-80 bg-gradient-to-b from-blue-400/20 to-transparent blur-md"></div>
+          </div>
+
+          {/* Gradient light spots */}
+          <div className="absolute top-1/4 left-1/4 w-20 h-20 rounded-full bg-gradient-to-r from-blue-500/5 to-purple-500/5 blur-2xl"></div>
+          <div className="absolute bottom-1/3 right-1/3 w-24 h-24 rounded-full bg-gradient-to-r from-pink-500/5 to-red-500/5 blur-2xl"></div>
+          <div className="absolute top-2/3 right-1/4 w-16 h-16 rounded-full bg-gradient-to-r from-green-500/5 to-emerald-500/5 blur-2xl"></div>
+
+          <div className="relative z-10">
+            <PeriodicTable />
+            <ElementComparisonTool />
+          </div>
         </div>
-
-        {/* Decorative elements - neon glows */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-          {/* Color orbs */}
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-purple-500/10 dark:bg-purple-600/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/3 -right-24 w-72 h-72 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-32 left-1/3 w-80 h-80 bg-pink-500/10 dark:bg-pink-600/10 rounded-full blur-3xl"></div>
-
-          {/* Light beams */}
-          <div className="absolute top-0 left-1/4 w-1 h-64 bg-gradient-to-b from-cyan-400/20 to-transparent blur-md"></div>
-          <div className="absolute top-1/4 right-1/3 w-1 h-96 bg-gradient-to-b from-purple-400/20 to-transparent blur-md"></div>
-          <div className="absolute top-10 left-2/3 w-1 h-80 bg-gradient-to-b from-blue-400/20 to-transparent blur-md"></div>
-        </div>
-
-        {/* Gradient light spots */}
-        <div className="absolute top-1/4 left-1/4 w-20 h-20 rounded-full bg-gradient-to-r from-blue-500/5 to-purple-500/5 blur-2xl"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-24 h-24 rounded-full bg-gradient-to-r from-pink-500/5 to-red-500/5 blur-2xl"></div>
-        <div className="absolute top-2/3 right-1/4 w-16 h-16 rounded-full bg-gradient-to-r from-green-500/5 to-emerald-500/5 blur-2xl"></div>
-
-        <div className="relative z-10">
-          <PeriodicTable />
-          <ElementComparisonTool />
-        </div>
-      </div>
       </ComparisonProvider>
     </ThemeProvider>
   );

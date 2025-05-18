@@ -17,7 +17,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Bar, Radar, PolarArea } from "react-chartjs-2";
+import { Bar, PolarArea } from "react-chartjs-2";
 import Atom3DModel from "./Atom3DModel";
 
 // Register ChartJS components
@@ -49,6 +49,13 @@ function ElementComparisonTool() {
   const compareContentRef = useRef(null);
   const compareTableRef = useRef(null);
   const chartRef = useRef(null);
+
+  // Force activeVisType to "bar" if it was previously "radar"
+  useEffect(() => {
+    if (activeVisType === "radar") {
+      setActiveVisType("bar");
+    }
+  }, [activeVisType]);
 
   // GSAP animations when modal opens
   useEffect(() => {
@@ -135,8 +142,7 @@ function ElementComparisonTool() {
       description: "Amount of energy needed to raise 1 mole by 1 kelvin",
     },
   ];
-
-  // Prepare chart data for the selected elements
+  // Prepare enhanced chart data for the selected elements
   const getComparisonChartData = () => {
     if (elementsToCompare.length !== 2) return null;
 
@@ -152,31 +158,77 @@ function ElementComparisonTool() {
         !isNaN(parseFloat(element2[prop.key]))
     );
 
+    // Sort properties by the magnitude of difference between elements
+    // This helps highlight the most significant differences
+    const sortedProperties = [...validProperties].sort((a, b) => {
+      const diff1 = Math.abs(
+        parseFloat(element1[a.key]) - parseFloat(element2[a.key])
+      );
+      const diff2 = Math.abs(
+        parseFloat(element1[b.key]) - parseFloat(element2[b.key])
+      );
+      return diff2 - diff1;
+    });
+
+    // Take only the top 6 most different properties to avoid chart clutter
+    const topProperties = sortedProperties.slice(0, 6);
+
+    // Calculate percentage differences for tooltip display
+    const percentDifferences = topProperties.map((prop) => {
+      const val1 = parseFloat(element1[prop.key]);
+      const val2 = parseFloat(element2[prop.key]);
+      const percentDiff = (
+        (Math.abs(val1 - val2) / Math.min(val1, val2)) *
+        100
+      ).toFixed(1);
+      return {
+        property: prop,
+        percentDiff: percentDiff,
+      };
+    });
+
+    // Get neon colors with enhanced visual effects
+    const color1 = getNeonColor(element1.category);
+    const color2 = getNeonColor(element2.category);
+
+    // Create gradient backgrounds for better visual appeal
+    const gradient1 = `linear-gradient(180deg, ${color1}90 0%, ${color1}40 100%)`;
+    const gradient2 = `linear-gradient(180deg, ${color2}90 0%, ${color2}40 100%)`;
+
     return {
-      labels: validProperties.map((prop) => prop.label),
+      labels: topProperties.map((prop) => prop.label),
       datasets: [
         {
           label: element1.name,
-          data: validProperties.map((prop) => parseFloat(element1[prop.key])),
-          backgroundColor: `${getNeonColor(element1.category)}80`,
-          borderColor: getNeonColor(element1.category),
+          data: topProperties.map((prop) => parseFloat(element1[prop.key])),
+          backgroundColor: color1 + "80",
+          borderColor: color1,
           borderWidth: 2,
-          hoverBackgroundColor: `${getNeonColor(element1.category)}A0`,
-          hoverBorderColor: getNeonColor(element1.category),
-          borderRadius: 5,
+          hoverBackgroundColor: color1 + "A0",
+          hoverBorderColor: color1,
+          borderRadius: 6,
+          shadowOffsetX: 3,
+          shadowOffsetY: 3,
+          shadowBlur: 10,
+          shadowColor: color1 + "40",
         },
         {
           label: element2.name,
-          data: validProperties.map((prop) => parseFloat(element2[prop.key])),
-          backgroundColor: `${getNeonColor(element2.category)}80`,
-          borderColor: getNeonColor(element2.category),
+          data: topProperties.map((prop) => parseFloat(element2[prop.key])),
+          backgroundColor: color2 + "80",
+          borderColor: color2,
           borderWidth: 2,
-          hoverBackgroundColor: `${getNeonColor(element2.category)}A0`,
-          hoverBorderColor: getNeonColor(element2.category),
-          borderRadius: 5,
+          hoverBackgroundColor: color2 + "A0",
+          hoverBorderColor: color2,
+          borderRadius: 6,
+          shadowOffsetX: 3,
+          shadowOffsetY: 3,
+          shadowBlur: 10,
+          shadowColor: color2 + "40",
         },
       ],
-      properties: validProperties,
+      properties: topProperties,
+      percentDifferences: percentDifferences,
     };
   };
 
@@ -326,11 +378,14 @@ function ElementComparisonTool() {
       Object.keys(colorMap).find((name) => baseColor.includes(name)) || "blue";
     return colorMap[colorName][index % 4];
   };
-
-  // Chart options for consistent styling
+  // Enhanced chart options for better styling and information display
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1500,
+      easing: "easeOutQuart",
+    },
     plugins: {
       legend: {
         position: "top",
@@ -338,98 +393,143 @@ function ElementComparisonTool() {
           color: "white",
           font: {
             family: "system-ui",
+            weight: "600",
+            size: 12,
           },
+          padding: 15,
+          usePointStyle: true,
+          pointStyle: "circle",
         },
       },
       tooltip: {
+        backgroundColor: "rgba(20, 20, 20, 0.9)",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        titleFont: {
+          family: "system-ui",
+          size: 14,
+          weight: "bold",
+        },
+        bodyFont: {
+          family: "system-ui",
+          size: 12,
+        },
+        padding: 12,
+        cornerRadius: 8,
+        boxPadding: 6,
         callbacks: {
+          title: function (tooltipItems) {
+            return tooltipItems[0].label;
+          },
           label: function (context) {
             const datasetLabel = context.dataset.label || "";
             const value = context.parsed.y || context.parsed || 0;
             const propertyIndex = context.dataIndex;
-            const property =
-              getComparisonChartData()?.properties?.[propertyIndex];
+            const chartData = getComparisonChartData();
+            const property = chartData?.properties?.[propertyIndex];
             const unit = property?.unit || "";
-            return `${datasetLabel}: ${value}${unit ? " " + unit : ""}`;
+            const percentDiff =
+              chartData?.percentDifferences?.[propertyIndex]?.percentDiff;
+
+            // Create an enhanced label with value and unit
+            let label = `${datasetLabel}: ${value.toLocaleString()}${
+              unit ? " " + unit : ""
+            }`;
+
+            // Add percentage difference information if available
+            if (percentDiff) {
+              const otherValue =
+                context.datasetIndex === 0
+                  ? chartData.datasets[1].data[propertyIndex]
+                  : chartData.datasets[0].data[propertyIndex];
+
+              const comparison = value > otherValue ? "higher" : "lower";
+
+              // Add an additional line with difference percentage
+              return [label, `${comparison} by ${percentDiff}%`];
+            }
+
+            return label;
           },
+          labelTextColor: function (context) {
+            const colorSet =
+              context.datasetIndex === 0
+                ? getNeonColor(elementsToCompare[0]?.category)
+                : getNeonColor(elementsToCompare[1]?.category);
+            return colorSet;
+          },
+        },
+      },
+      title: {
+        display: true,
+        text: "Key Property Comparison",
+        color: "rgba(255, 255, 255, 0.8)",
+        font: {
+          family: "system-ui",
+          size: 16,
+          weight: "normal",
+        },
+        padding: {
+          top: 0,
+          bottom: 15,
         },
       },
     },
     scales: {
       y: {
         grid: {
-          color: "rgba(255, 255, 255, 0.1)",
+          color: "rgba(255, 255, 255, 0.08)",
+          lineWidth: 0.5,
+          drawBorder: false,
         },
         ticks: {
           color: "rgba(255, 255, 255, 0.7)",
+          font: {
+            family: "system-ui",
+            size: 11,
+          },
+          padding: 8,
+          callback: function (value) {
+            // Format large numbers with k, M suffixes
+            if (value >= 1000000) return (value / 1000000).toFixed(1) + "M";
+            if (value >= 1000) return (value / 1000).toFixed(1) + "k";
+            return value;
+          },
         },
+        beginAtZero: true,
       },
       x: {
         grid: {
-          color: "rgba(255, 255, 255, 0.1)",
+          display: false,
         },
         ticks: {
-          color: "rgba(255, 255, 255, 0.7)",
-        },
-      },
-    },
-  };
-
-  // Special options for radar chart
-  const radarOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: "white",
+          color: "rgba(255, 255, 255, 0.9)",
           font: {
             family: "system-ui",
+            weight: "500",
+            size: 11,
           },
-        },
-      },
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            const datasetLabel = context.dataset.label || "";
-            const normalizedValue = context.raw;
-            const datasetIndex = context.datasetIndex;
-            const propertyIndex = context.dataIndex;
-
-            // Get the raw values
-            const rawValues = getNormalizedChartData()?.rawValues;
-            const rawValue = rawValues?.[propertyIndex]?.[datasetIndex];
-            const property =
-              getNormalizedChartData()?.properties?.[propertyIndex];
-            const unit = property?.unit || "";
-
-            return [
-              `${datasetLabel}: ${rawValue}${unit ? " " + unit : ""}`,
-              `Relative scale: ${normalizedValue.toFixed(1)}%`,
-            ];
-          },
+          maxRotation: 45,
+          minRotation: 45,
         },
       },
     },
-    scales: {
-      r: {
-        angleLines: {
-          color: "rgba(255, 255, 255, 0.1)",
-        },
-        grid: {
-          color: "rgba(255, 255, 255, 0.1)",
-        },
-        pointLabels: {
-          color: "rgba(255, 255, 255, 0.7)",
-        },
-        ticks: {
-          display: false,
-          backdropColor: "transparent",
-        },
+    layout: {
+      padding: {
+        top: 5,
+        right: 20,
+        bottom: 5,
+        left: 10,
+      },
+    },
+    elements: {
+      bar: {
+        borderRadius: 6,
+        borderSkipped: false,
       },
     },
   };
+  // Removed radar options
 
   // Special options for polar chart
   const polarOptions = {
@@ -459,10 +559,8 @@ function ElementComparisonTool() {
       },
     },
   };
-
   // Prepare all chart data
   const barChartData = getComparisonChartData();
-  const radarChartData = getNormalizedChartData();
   const polarChartData = getPolarChartData();
 
   // Handle escape key press
@@ -665,10 +763,10 @@ function ElementComparisonTool() {
                   <li>
                     Switch to "Visualize" tab to explore interactive visual
                     comparisons
-                  </li>
+                  </li>{" "}
                   <li>
-                    Try different visualization types: Bar Chart, Radar Plot,
-                    and Atomic Structure
+                    Try different visualization types: Bar Chart and Atomic
+                    Structure
                   </li>
                   <li>You can add up to 2 elements for comparison</li>
                   <li>
@@ -820,6 +918,7 @@ function ElementComparisonTool() {
                     <div className="mt-6">
                       {/* Visualization tabs */}
                       <div className="flex justify-center gap-2 mb-6">
+                        {" "}
                         <button
                           onClick={() => setActiveVisType("bar")}
                           className={`px-4 py-1.5 rounded-full text-sm ${
@@ -844,32 +943,6 @@ function ElementComparisonTool() {
                               />
                             </svg>
                             Bar Chart
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => setActiveVisType("radar")}
-                          className={`px-4 py-1.5 rounded-full text-sm ${
-                            activeVisType === "radar"
-                              ? "bg-white/20 text-white shadow-inner font-medium"
-                              : "bg-white/10 text-gray-300 hover:bg-white/15"
-                          }`}
-                        >
-                          <div className="flex items-center gap-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                              />
-                            </svg>
-                            Radar Plot
                           </div>
                         </button>
                         <button
@@ -914,36 +987,71 @@ function ElementComparisonTool() {
                           </div>
                         ) : (
                           <>
+                            {" "}
                             {activeVisType === "bar" && barChartData && (
                               <>
-                                <div className="h-80">
+                                <div className="h-80 glassmorphism p-3 rounded-lg border border-white/20">
                                   <Bar
                                     data={barChartData}
                                     options={chartOptions}
+                                    plugins={[
+                                      {
+                                        id: "chartGlow",
+                                        beforeDraw: function (chart) {
+                                          // Add glow effect to the chart
+                                          const ctx = chart.ctx;
+                                          ctx.shadowColor =
+                                            "rgba(120, 255, 255, 0.2)";
+                                          ctx.shadowBlur = 15;
+                                        },
+                                      },
+                                    ]}
                                   />
                                 </div>
-                                <p className="mt-4 text-sm text-gray-400 text-center">
-                                  Direct comparison of element properties with
-                                  their actual values.
-                                </p>
-                              </>
-                            )}
-
-                            {activeVisType === "radar" && radarChartData && (
-                              <>
-                                <div className="h-80">
-                                  <Radar
-                                    data={radarChartData}
-                                    options={radarOptions}
-                                  />
+                                <div className="mt-5 p-3 bg-white/5 dark:bg-black/20 rounded-lg border border-white/10">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-5 w-5 text-cyan-400"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                      />
+                                    </svg>
+                                    <h3 className="text-sm font-medium text-white">
+                                      Property Comparison Insights
+                                    </h3>
+                                  </div>
+                                  <div className="text-xs text-gray-300">
+                                    <p className="mb-1">
+                                      This chart shows the most significant
+                                      differences between
+                                      <span className="text-white font-medium mx-1">
+                                        {elementsToCompare[0]?.name}
+                                      </span>{" "}
+                                      and
+                                      <span className="text-white font-medium mx-1">
+                                        {elementsToCompare[1]?.name}
+                                      </span>
+                                      .
+                                    </p>
+                                    <p>
+                                      Hover over chart bars to see detailed
+                                      comparisons, including percentage
+                                      differences. Properties are sorted by
+                                      magnitude of difference to highlight key
+                                      distinctions.
+                                    </p>
+                                  </div>
                                 </div>
-                                <p className="mt-4 text-sm text-gray-400 text-center">
-                                  Normalized comparison showing relative
-                                  property values on a 0-100% scale.
-                                </p>
                               </>
                             )}
-
                             {activeVisType === "atomic" && (
                               <>
                                 <div className="mb-4 p-3 bg-white/5 dark:bg-black/20 rounded-lg border border-white/10">

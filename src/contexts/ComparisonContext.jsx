@@ -22,7 +22,10 @@ export const ComparisonProvider = ({ children }) => {
 
   // Save tutorial state to localStorage
   useEffect(() => {
-    localStorage.setItem("comparison-tutorial-seen", JSON.stringify(hasSeenTutorial));
+    localStorage.setItem(
+      "comparison-tutorial-seen",
+      JSON.stringify(hasSeenTutorial)
+    );
   }, [hasSeenTutorial]);
 
   // Add element to comparison (max 2 elements)
@@ -30,23 +33,23 @@ export const ComparisonProvider = ({ children }) => {
     setElementsToCompare((prev) => {
       // Check if element is already in comparison
       const isAlreadyAdded = prev.some((e) => e.number === element.number);
-      
+
       if (isAlreadyAdded) {
         return prev;
       }
-      
+
       // If there are already 2 elements, replace the oldest one
       if (prev.length >= 2) {
         return [prev[1], element];
       }
-      
+
       return [...prev, element];
     });
   };
 
   // Remove element from comparison
   const removeFromComparison = (elementNumber) => {
-    setElementsToCompare((prev) => 
+    setElementsToCompare((prev) =>
       prev.filter((element) => element.number !== elementNumber)
     );
   };
@@ -58,7 +61,7 @@ export const ComparisonProvider = ({ children }) => {
 
   // Toggle comparison mode
   const toggleComparisonMode = () => {
-    setComparisonMode(prev => {
+    setComparisonMode((prev) => {
       if (prev) {
         // If turning off comparison mode, clear selected elements
         clearComparison();
@@ -96,7 +99,7 @@ export const ComparisonProvider = ({ children }) => {
     toggleComparisonMode,
     openComparison,
     closeComparison,
-    dismissTutorial
+    dismissTutorial,
   };
 
   return (

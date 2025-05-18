@@ -146,7 +146,8 @@ function PeriodicTable() {
   ].sort();
   const uniqueStates = [
     ...new Set(elements.map((element) => element.phase)),
-  ].sort();  return (
+  ].sort();
+  return (
     <div
       ref={wrapperRef}
       className="p-4 text-gray-800 dark:text-gray-200 pt-16 min-h-screen custom-scrollbar"
