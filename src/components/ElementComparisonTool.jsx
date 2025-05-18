@@ -356,31 +356,31 @@ function ElementComparisonTool() {
   const formatValueWithUnit = (value, unit) => {
     // Format based on unit type
     if (value === undefined || value === null) return "—";
-    
+
     // Handle large numbers
     if (value >= 1000000) {
-      return `${(value / 1000000).toFixed(2)}M ${unit || ''}`;
+      return `${(value / 1000000).toFixed(2)}M ${unit || ""}`;
     } else if (value >= 1000) {
-      return `${(value / 1000).toFixed(1)}k ${unit || ''}`;
-    } 
-    
+      return `${(value / 1000).toFixed(1)}k ${unit || ""}`;
+    }
+
     // Format based on unit type
     switch (unit) {
-      case 'K': // Temperature
+      case "K": // Temperature
         return `${value.toFixed(1)} K`;
-      case 'eV': // Energy
+      case "eV": // Energy
         return `${value.toFixed(2)} eV`;
-      case 'g/cm³': // Density
+      case "g/cm³": // Density
         return `${value.toFixed(3)} g/cm³`;
-      case 'u': // Atomic mass
+      case "u": // Atomic mass
         return `${value.toFixed(3)} u`;
-      case 'J/(mol·K)': // Molar heat
+      case "J/(mol·K)": // Molar heat
         return `${value.toFixed(2)} J/(mol·K)`;
       default:
         return value.toLocaleString();
     }
   };
-  
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -545,12 +545,12 @@ function ElementComparisonTool() {
     return validProperties.map((prop) => {
       const val1 = parseFloat(element1[prop.key]);
       const val2 = parseFloat(element2[prop.key]);
-      
+
       const percentDiff = (
         (Math.abs(val1 - val2) / Math.min(val1, val2)) *
         100
       ).toFixed(1);
-      
+
       const color1 = getNeonColor(element1.category);
       const color2 = getNeonColor(element2.category);
 
@@ -572,10 +572,10 @@ function ElementComparisonTool() {
               shadowBlur: 10,
               shadowColor: [color1 + "40", color2 + "40"],
             },
-          ]
+          ],
         },
         percentDiff: percentDiff,
-        rawValues: [val1, val2]
+        rawValues: [val1, val2],
       };
     });
   };
@@ -588,7 +588,7 @@ function ElementComparisonTool() {
         duration: 1200,
         easing: "easeOutQuart",
       },
-      indexAxis: 'y', // Horizontal bar chart
+      indexAxis: "y", // Horizontal bar chart
       plugins: {
         legend: {
           display: false,
@@ -612,7 +612,8 @@ function ElementComparisonTool() {
           callbacks: {
             title: function (tooltipItems) {
               return tooltipItems[0].dataset.label || tooltipItems[0].label;
-            },            label: function (context) {
+            },
+            label: function (context) {
               const value = context.parsed.x;
               return formatValueWithUnit(value, property.unit);
             },
@@ -656,7 +657,9 @@ function ElementComparisonTool() {
           },
           title: {
             display: true,
-            text: property.unit ? `${property.label} (${property.unit})` : property.label,
+            text: property.unit
+              ? `${property.label} (${property.unit})`
+              : property.label,
             color: "rgba(255, 255, 255, 0.6)",
             font: {
               family: "system-ui",
@@ -1106,11 +1109,14 @@ function ElementComparisonTool() {
                             Atomic Structure
                           </div>
                         </button>
-                      </div>{" "}                      {/* Visualization content */}
+                      </div>{" "}
+                      {/* Visualization content */}
                       <div
                         ref={chartRef}
                         className={`${
-                          activeVisType === "atomic" || activeVisType === "bar" ? "h-auto" : "h-80"
+                          activeVisType === "atomic" || activeVisType === "bar"
+                            ? "h-auto"
+                            : "h-80"
                         } relative`}
                       >
                         {elementsToCompare.length !== 2 ? (
@@ -1121,7 +1127,8 @@ function ElementComparisonTool() {
                           </div>
                         ) : (
                           <>
-                            {" "}                            {activeVisType === "bar" && individualChartData && (
+                            {" "}
+                            {activeVisType === "bar" && individualChartData && (
                               <>
                                 <div className="overflow-y-auto max-h-[600px] pr-2">
                                   <div className="mt-5 p-3 bg-white/5 dark:bg-black/20 rounded-lg border border-white/10 mb-5">
@@ -1146,7 +1153,8 @@ function ElementComparisonTool() {
                                     </div>
                                     <div className="text-xs text-gray-300">
                                       <p className="mb-1">
-                                        These charts show individual property comparisons between
+                                        These charts show individual property
+                                        comparisons between
                                         <span className="text-white font-medium mx-1">
                                           {elementsToCompare[0]?.name}
                                         </span>{" "}
@@ -1156,47 +1164,67 @@ function ElementComparisonTool() {
                                         </span>
                                       </p>
                                       <p>
-                                        Each graph has been optimized to display its specific unit type.
-                                        Hover over bars to see exact values.
+                                        Each graph has been optimized to display
+                                        its specific unit type. Hover over bars
+                                        to see exact values.
                                       </p>
                                     </div>
                                   </div>
-                                  
+
                                   <div className="grid grid-cols-1 gap-6">
-                                    {individualChartData.map((propertyData, index) => (
-                                      <div 
-                                        key={propertyData.property.key} 
-                                        className="h-52 glassmorphism p-3 rounded-lg border border-white/20"
-                                      >                                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 text-xs text-gray-300">
-                                          <span className="mb-1 sm:mb-0">{propertyData.property.description}</span>
-                                          {propertyData.percentDiff && (
-                                            <span className="bg-white/10 px-2 py-0.5 rounded-full text-cyan-300">
-                                              <span className="font-medium">{Math.abs(propertyData.rawValues[0] - propertyData.rawValues[1]) > 0.01 ? 
-                                                (propertyData.rawValues[0] > propertyData.rawValues[1] ? 
-                                                  `${elementsToCompare[0].name} higher by ` : 
-                                                  `${elementsToCompare[1].name} higher by `) : 
-                                                "Difference: "}</span>
-                                              {propertyData.percentDiff}%
+                                    {individualChartData.map(
+                                      (propertyData, index) => (
+                                        <div
+                                          key={propertyData.property.key}
+                                          className="h-52 glassmorphism p-3 rounded-lg border border-white/20"
+                                        >
+                                          {" "}
+                                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 text-xs text-gray-300">
+                                            <span className="mb-1 sm:mb-0">
+                                              {
+                                                propertyData.property
+                                                  .description
+                                              }
                                             </span>
-                                          )}
-                                        </div>
-                                        <Bar
-                                          data={propertyData.data}
-                                          options={getPropertyChartOptions(propertyData.property)}
-                                          plugins={[
-                                            {
-                                              id: `chartGlow-${index}`,
-                                              beforeDraw: function (chart) {
-                                                // Add glow effect to the chart
-                                                const ctx = chart.ctx;
-                                                ctx.shadowColor = "rgba(120, 255, 255, 0.2)";
-                                                ctx.shadowBlur = 15;
+                                            {propertyData.percentDiff && (
+                                              <span className="bg-white/10 px-2 py-0.5 rounded-full text-cyan-300">
+                                                <span className="font-medium">
+                                                  {Math.abs(
+                                                    propertyData.rawValues[0] -
+                                                      propertyData.rawValues[1]
+                                                  ) > 0.01
+                                                    ? propertyData
+                                                        .rawValues[0] >
+                                                      propertyData.rawValues[1]
+                                                      ? `${elementsToCompare[0].name} higher by `
+                                                      : `${elementsToCompare[1].name} higher by `
+                                                    : "Difference: "}
+                                                </span>
+                                                {propertyData.percentDiff}%
+                                              </span>
+                                            )}
+                                          </div>
+                                          <Bar
+                                            data={propertyData.data}
+                                            options={getPropertyChartOptions(
+                                              propertyData.property
+                                            )}
+                                            plugins={[
+                                              {
+                                                id: `chartGlow-${index}`,
+                                                beforeDraw: function (chart) {
+                                                  // Add glow effect to the chart
+                                                  const ctx = chart.ctx;
+                                                  ctx.shadowColor =
+                                                    "rgba(120, 255, 255, 0.2)";
+                                                  ctx.shadowBlur = 15;
+                                                },
                                               },
-                                            },
-                                          ]}
-                                        />
-                                      </div>
-                                    ))}
+                                            ]}
+                                          />
+                                        </div>
+                                      )
+                                    )}
                                   </div>
                                 </div>
                               </>
