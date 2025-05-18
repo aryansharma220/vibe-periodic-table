@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getNeonColor } from "../utils/elementUtils";
 import ReactMarkdown from "react-markdown";
-import "./chatbot.css"; // We'll create this file for the noise texture
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);

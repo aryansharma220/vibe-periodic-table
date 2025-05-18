@@ -352,6 +352,35 @@ function ElementComparisonTool() {
       Object.keys(colorMap).find((name) => baseColor.includes(name)) || "blue";
     return colorMap[colorName][index % 4];
   };
+
+  const formatValueWithUnit = (value, unit) => {
+    // Format based on unit type
+    if (value === undefined || value === null) return "—";
+    
+    // Handle large numbers
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(2)}M ${unit || ''}`;
+    } else if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}k ${unit || ''}`;
+    } 
+    
+    // Format based on unit type
+    switch (unit) {
+      case 'K': // Temperature
+        return `${value.toFixed(1)} K`;
+      case 'eV': // Energy
+        return `${value.toFixed(2)} eV`;
+      case 'g/cm³': // Density
+        return `${value.toFixed(3)} g/cm³`;
+      case 'u': // Atomic mass
+        return `${value.toFixed(3)} u`;
+      case 'J/(mol·K)': // Molar heat
+        return `${value.toFixed(2)} J/(mol·K)`;
+      default:
+        return value.toLocaleString();
+    }
+  };
+  
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -499,7 +528,179 @@ function ElementComparisonTool() {
     },
   };
 
+  const getIndividualPropertyChartData = () => {
+    if (elementsToCompare.length !== 2) return null;
+
+    const element1 = elementsToCompare[0];
+    const element2 = elementsToCompare[1];
+
+    const validProperties = propertiesToVisualize.filter(
+      (prop) =>
+        element1[prop.key] &&
+        element2[prop.key] &&
+        !isNaN(parseFloat(element1[prop.key])) &&
+        !isNaN(parseFloat(element2[prop.key]))
+    );
+
+    return validProperties.map((prop) => {
+      const val1 = parseFloat(element1[prop.key]);
+      const val2 = parseFloat(element2[prop.key]);
+      
+      const percentDiff = (
+        (Math.abs(val1 - val2) / Math.min(val1, val2)) *
+        100
+      ).toFixed(1);
+      
+      const color1 = getNeonColor(element1.category);
+      const color2 = getNeonColor(element2.category);
+
+      return {
+        property: prop,
+        data: {
+          labels: [element1.name, element2.name],
+          datasets: [
+            {
+              data: [val1, val2],
+              backgroundColor: [color1 + "80", color2 + "80"],
+              borderColor: [color1, color2],
+              borderWidth: 2,
+              hoverBackgroundColor: [color1 + "A0", color2 + "A0"],
+              hoverBorderColor: [color1, color2],
+              borderRadius: 6,
+              shadowOffsetX: 3,
+              shadowOffsetY: 3,
+              shadowBlur: 10,
+              shadowColor: [color1 + "40", color2 + "40"],
+            },
+          ]
+        },
+        percentDiff: percentDiff,
+        rawValues: [val1, val2]
+      };
+    });
+  };
+
+  const getPropertyChartOptions = (property) => {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1200,
+        easing: "easeOutQuart",
+      },
+      indexAxis: 'y', // Horizontal bar chart
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          backgroundColor: "rgba(20, 20, 20, 0.9)",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          titleFont: {
+            family: "system-ui",
+            size: 14,
+            weight: "bold",
+          },
+          bodyFont: {
+            family: "system-ui",
+            size: 12,
+          },
+          padding: 12,
+          cornerRadius: 8,
+          boxPadding: 6,
+          callbacks: {
+            title: function (tooltipItems) {
+              return tooltipItems[0].dataset.label || tooltipItems[0].label;
+            },            label: function (context) {
+              const value = context.parsed.x;
+              return formatValueWithUnit(value, property.unit);
+            },
+          },
+        },
+        title: {
+          display: true,
+          text: property.label,
+          color: "rgba(255, 255, 255, 0.8)",
+          font: {
+            family: "system-ui",
+            size: 16,
+            weight: "normal",
+          },
+          padding: {
+            top: 0,
+            bottom: 10,
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: {
+            color: "rgba(255, 255, 255, 0.08)",
+            lineWidth: 0.5,
+            drawBorder: false,
+          },
+          ticks: {
+            color: "rgba(255, 255, 255, 0.7)",
+            font: {
+              family: "system-ui",
+              size: 11,
+            },
+            padding: 8,
+            callback: function (value) {
+              // Format large numbers with k, M suffixes
+              if (value >= 1000000) return (value / 1000000).toFixed(1) + "M";
+              if (value >= 1000) return (value / 1000).toFixed(1) + "k";
+              return value;
+            },
+          },
+          title: {
+            display: true,
+            text: property.unit ? `${property.label} (${property.unit})` : property.label,
+            color: "rgba(255, 255, 255, 0.6)",
+            font: {
+              family: "system-ui",
+              size: 12,
+            },
+            padding: {
+              top: 10,
+            },
+          },
+          beginAtZero: true,
+        },
+        y: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: "rgba(255, 255, 255, 0.9)",
+            font: {
+              family: "system-ui",
+              weight: "500",
+              size: 12,
+            },
+          },
+        },
+      },
+      layout: {
+        padding: {
+          top: 5,
+          right: 15,
+          bottom: 15,
+          left: 5,
+        },
+      },
+      elements: {
+        bar: {
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+      },
+    };
+  };
+
   const barChartData = getComparisonChartData();
+  const individualChartData = getIndividualPropertyChartData();
 
   useEffect(() => {
     const handleKeydown = (e) => {
@@ -905,12 +1106,11 @@ function ElementComparisonTool() {
                             Atomic Structure
                           </div>
                         </button>
-                      </div>{" "}
-                      {/* Visualization content */}
+                      </div>{" "}                      {/* Visualization content */}
                       <div
                         ref={chartRef}
                         className={`${
-                          activeVisType === "atomic" ? "h-auto" : "h-80"
+                          activeVisType === "atomic" || activeVisType === "bar" ? "h-auto" : "h-80"
                         } relative`}
                       >
                         {elementsToCompare.length !== 2 ? (
@@ -921,67 +1121,82 @@ function ElementComparisonTool() {
                           </div>
                         ) : (
                           <>
-                            {" "}
-                            {activeVisType === "bar" && barChartData && (
+                            {" "}                            {activeVisType === "bar" && individualChartData && (
                               <>
-                                <div className="h-80 glassmorphism p-3 rounded-lg border border-white/20">
-                                  <Bar
-                                    data={barChartData}
-                                    options={chartOptions}
-                                    plugins={[
-                                      {
-                                        id: "chartGlow",
-                                        beforeDraw: function (chart) {
-                                          // Add glow effect to the chart
-                                          const ctx = chart.ctx;
-                                          ctx.shadowColor =
-                                            "rgba(120, 255, 255, 0.2)";
-                                          ctx.shadowBlur = 15;
-                                        },
-                                      },
-                                    ]}
-                                  />
-                                </div>
-                                <div className="mt-5 p-3 bg-white/5 dark:bg-black/20 rounded-lg border border-white/10">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-5 w-5 text-cyan-400"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                      />
-                                    </svg>
-                                    <h3 className="text-sm font-medium text-white">
-                                      Property Comparison Insights
-                                    </h3>
+                                <div className="overflow-y-auto max-h-[600px] pr-2">
+                                  <div className="mt-5 p-3 bg-white/5 dark:bg-black/20 rounded-lg border border-white/10 mb-5">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5 text-cyan-400"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                      </svg>
+                                      <h3 className="text-sm font-medium text-white">
+                                        Property Comparison Insights
+                                      </h3>
+                                    </div>
+                                    <div className="text-xs text-gray-300">
+                                      <p className="mb-1">
+                                        These charts show individual property comparisons between
+                                        <span className="text-white font-medium mx-1">
+                                          {elementsToCompare[0]?.name}
+                                        </span>{" "}
+                                        and
+                                        <span className="text-white font-medium mx-1">
+                                          {elementsToCompare[1]?.name}
+                                        </span>
+                                      </p>
+                                      <p>
+                                        Each graph has been optimized to display its specific unit type.
+                                        Hover over bars to see exact values.
+                                      </p>
+                                    </div>
                                   </div>
-                                  <div className="text-xs text-gray-300">
-                                    <p className="mb-1">
-                                      This chart shows the most significant
-                                      differences between
-                                      <span className="text-white font-medium mx-1">
-                                        {elementsToCompare[0]?.name}
-                                      </span>{" "}
-                                      and
-                                      <span className="text-white font-medium mx-1">
-                                        {elementsToCompare[1]?.name}
-                                      </span>
-                                      .
-                                    </p>
-                                    <p>
-                                      Hover over chart bars to see detailed
-                                      comparisons, including percentage
-                                      differences. Properties are sorted by
-                                      magnitude of difference to highlight key
-                                      distinctions.
-                                    </p>
+                                  
+                                  <div className="grid grid-cols-1 gap-6">
+                                    {individualChartData.map((propertyData, index) => (
+                                      <div 
+                                        key={propertyData.property.key} 
+                                        className="h-52 glassmorphism p-3 rounded-lg border border-white/20"
+                                      >                                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 text-xs text-gray-300">
+                                          <span className="mb-1 sm:mb-0">{propertyData.property.description}</span>
+                                          {propertyData.percentDiff && (
+                                            <span className="bg-white/10 px-2 py-0.5 rounded-full text-cyan-300">
+                                              <span className="font-medium">{Math.abs(propertyData.rawValues[0] - propertyData.rawValues[1]) > 0.01 ? 
+                                                (propertyData.rawValues[0] > propertyData.rawValues[1] ? 
+                                                  `${elementsToCompare[0].name} higher by ` : 
+                                                  `${elementsToCompare[1].name} higher by `) : 
+                                                "Difference: "}</span>
+                                              {propertyData.percentDiff}%
+                                            </span>
+                                          )}
+                                        </div>
+                                        <Bar
+                                          data={propertyData.data}
+                                          options={getPropertyChartOptions(propertyData.property)}
+                                          plugins={[
+                                            {
+                                              id: `chartGlow-${index}`,
+                                              beforeDraw: function (chart) {
+                                                // Add glow effect to the chart
+                                                const ctx = chart.ctx;
+                                                ctx.shadowColor = "rgba(120, 255, 255, 0.2)";
+                                                ctx.shadowBlur = 15;
+                                              },
+                                            },
+                                          ]}
+                                        />
+                                      </div>
+                                    ))}
                                   </div>
                                 </div>
                               </>
