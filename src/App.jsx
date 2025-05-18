@@ -134,6 +134,10 @@ function App() {
   const [shootingStars] = useState(() =>
     Array.from({ length: 4 }, (_, i) => i)
   ); // 3 shooting stars (reduced from 5)
+  
+  // Refs for cursor effect
+  const cursorLightRef = useRef(null);
+  const cursorDotRef = useRef(null);
 
   // Initialize grid background and stars
   useEffect(() => {
@@ -196,6 +200,20 @@ function App() {
             opacity: 0;
           }
         }
+        /* Smooth cursor hover effect */
+        @keyframes cursor-hover-in {
+          0% { transform: scale(1); }
+          100% { transform: scale(1.5); }
+        }
+        @keyframes cursor-hover-out {
+          0% { transform: scale(1.5); }
+          100% { transform: scale(1); }
+        }
+        /* Nice ripple effect animation */
+        @keyframes ripple {
+          0% { transform: scale(0); opacity: 1; }
+          100% { transform: scale(1); opacity: 0; }
+        }
       `;
       document.head.appendChild(style);
 
@@ -203,6 +221,320 @@ function App() {
         document.head.removeChild(style);
       };
     }
+  }, []);    // Add cursor perspective light effect
+  useEffect(() => {
+    // Create cursor light elements if they don't exist
+    if (!document.querySelector('.cursor-light')) {
+      const cursorLight = document.createElement('div');
+      cursorLight.className = 'cursor-light';
+      document.body.appendChild(cursorLight);
+      cursorLightRef.current = cursorLight;
+      
+      const cursorDot = document.createElement('div');
+      cursorDot.className = 'cursor-dot';
+      document.body.appendChild(cursorDot);
+      cursorDotRef.current = cursorDot;
+      
+      // Add depth reveal layer
+      const depthLayer = document.createElement('div');
+      depthLayer.className = 'cursor-depth-reveal';
+      document.body.appendChild(depthLayer);
+      
+      // Add global style to hide cursor
+      const style = document.createElement('style');
+      style.textContent = '* { cursor: none !important; }';
+      document.head.appendChild(style);
+    }
+    
+    // Variables to track mouse position and movement
+    let mouseX = 0;
+    let mouseY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+    let mouseSpeedX = 0;
+    let mouseSpeedY = 0;
+    let targetWidth = 180;
+    let targetHeight = 180;
+    let currentWidth = 180;
+    let currentHeight = 180;
+    let isOverInteractive = false;
+    let cursorColor = 'white';
+    let cursorScale = 1;
+    let targetOffsetX = 0;
+    let targetOffsetY = 0;
+    let currentOffsetX = 0;
+    let currentOffsetY = 0;
+    let rafId = null;
+    
+    // Constants for smoother interpolation
+    const CURSOR_DOT_LERP_FACTOR = 0.5; // Faster for dot (more responsive)
+    const CURSOR_LIGHT_LERP_FACTOR = 0.16; // Slower for light glow (smoother trail)
+    const TRANSFORM_LERP_FACTOR = 0.14; // For transform effects
+    const SIZE_LERP_FACTOR = 0.15; // For size changes
+    
+    // Linear interpolation function
+    const lerp = (start, end, factor) => start * (1 - factor) + end * factor;
+    
+    // Animation frame function for smooth cursor updates
+    const animateCursor = () => {
+      if (cursorDotRef.current && cursorLightRef.current) {
+        // Interpolate positions for smooth movement
+        currentX = lerp(currentX, mouseX, CURSOR_DOT_LERP_FACTOR);
+        currentY = lerp(currentY, mouseY, CURSOR_DOT_LERP_FACTOR);
+        
+        // Interpolate size and offset
+        currentWidth = lerp(currentWidth, targetWidth, SIZE_LERP_FACTOR);
+        currentHeight = lerp(currentHeight, targetHeight, SIZE_LERP_FACTOR);
+        currentOffsetX = lerp(currentOffsetX, targetOffsetX, TRANSFORM_LERP_FACTOR);
+        currentOffsetY = lerp(currentOffsetY, targetOffsetY, TRANSFORM_LERP_FACTOR);
+        
+        // Calculate distance from center for perspective effect
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const distanceX = (currentX - centerX) / centerX;
+        const distanceY = (currentY - centerY) / centerY;
+        
+        // Update cursor dot position - needs to be very responsive
+        cursorDotRef.current.style.left = `${currentX}px`;
+        cursorDotRef.current.style.top = `${currentY}px`;
+        cursorDotRef.current.style.transform = `translate(-50%, -50%) scale(${cursorScale})`;
+        cursorDotRef.current.style.backgroundColor = cursorColor;
+        
+        // Update cursor light with smoother interpolation
+        cursorLightRef.current.style.width = `${currentWidth}px`;
+        cursorLightRef.current.style.height = `${currentHeight}px`;
+        cursorLightRef.current.style.left = `${currentX}px`;
+        cursorLightRef.current.style.top = `${currentY}px`;
+        cursorLightRef.current.style.transform = `
+          translate(-50%, -50%)
+          rotateX(${distanceY * -20}deg)
+          rotateY(${distanceX * 20}deg)
+          scale(${1 + Math.abs(distanceX) * 0.3 + Math.abs(distanceY) * 0.3})
+          translate(${currentOffsetX}px, ${currentOffsetY}px)
+        `;
+        
+        // Update depth layer CSS variables 
+        // Using currentX/Y for smoother gradients
+        document.documentElement.style.setProperty('--cursor-x', `${currentX}px`);
+        document.documentElement.style.setProperty('--cursor-y', `${currentY}px`);
+      }
+      
+      // Continue animation loop
+      rafId = requestAnimationFrame(animateCursor);
+    };
+    
+    // Start animation loop immediately
+    rafId = requestAnimationFrame(animateCursor);
+    
+    // Mouse move handler - now just updates target values
+    const handleMouseMove = (e) => {
+      // Get mouse position
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      // Calculate mouse speed for dynamic effects
+      mouseSpeedX = mouseX - prevMouseX;
+      mouseSpeedY = mouseY - prevMouseY;
+      const mouseSpeed = Math.sqrt(mouseSpeedX * mouseSpeedX + mouseSpeedY * mouseSpeedY);
+      
+      // Save current position as previous for next calculation
+      prevMouseX = mouseX;
+      prevMouseY = mouseY;
+      
+      // Dynamically adjust the light size based on mouse speed
+      const speedFactor = Math.min(Math.abs(mouseSpeed) * 0.4, 40);
+      const baseSize = 180;
+      targetWidth = baseSize + speedFactor;
+      targetHeight = baseSize + speedFactor;
+      
+      // Calculate slight offset based on mouse speed for more natural movement
+      targetOffsetX = Math.sign(mouseSpeedX) * Math.min(Math.abs(mouseSpeedX * 0.2), 20);
+      targetOffsetY = Math.sign(mouseSpeedY) * Math.min(Math.abs(mouseSpeedY * 0.2), 20);
+      
+      // Check if cursor is over interactive elements
+      const target = e.target;
+      isOverInteractive = 
+        target.tagName.toLowerCase() === 'a' || 
+        target.tagName.toLowerCase() === 'button' || 
+        target.getAttribute('role') === 'button' ||
+        target.tagName.toLowerCase() === 'input' ||
+        target.tagName.toLowerCase() === 'select' ||
+        target.tagName.toLowerCase() === 'textarea' ||
+        target.closest('a') ||
+        target.closest('button') ||
+        target.closest('[role="button"]') ||
+        target.closest('.element-card') ||
+        target.closest('[class*="interactive"]') ||
+        target.getAttribute('tabindex') === '0' ||
+        getComputedStyle(target).cursor === 'pointer';
+      
+      // Set target styles for interactive elements
+      if (isOverInteractive) {
+        cursorScale = 1.5;
+        cursorColor = 'rgba(6, 182, 212, 0.8)';
+      } else {
+        cursorScale = 1;
+        cursorColor = 'white';
+      }
+    };
+    
+    // Track click state for dynamic effects
+    let cursorClickMode = false;
+    let cursorBackground = `
+      radial-gradient(
+        circle at center,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(6, 182, 212, 0.7) 15%,
+        rgba(124, 58, 237, 0.5) 30%,
+        transparent 60%
+      )
+    `;
+    let cursorFilter = 'blur(3px)';
+    
+    // Mouse down/up handlers for interactive feedback
+    const handleMouseDown = (e) => {
+      // Update parameters for animation loop
+      cursorClickMode = true;
+      cursorScale = 0.6;
+      cursorColor = 'rgba(124, 58, 237, 0.9)';
+      targetWidth = 130;
+      targetHeight = 130;
+      cursorFilter = 'blur(2px)';
+      cursorBackground = `
+        radial-gradient(
+          circle at center,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(124, 58, 237, 0.8) 15%,
+          rgba(6, 182, 212, 0.6) 30%,
+          transparent 60%
+        )
+      `;
+      
+      if (cursorLightRef.current) {
+        cursorLightRef.current.style.filter = cursorFilter;
+        cursorLightRef.current.style.background = cursorBackground;
+      }
+      
+      // Add a ripple effect on click with smoother animation
+      const ripple = document.createElement('div');
+      ripple.style.position = 'fixed';
+      ripple.style.width = '10px';
+      ripple.style.height = '10px';
+      ripple.style.borderRadius = '50%';
+      ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+      ripple.style.left = `${e.clientX}px`;
+      ripple.style.top = `${e.clientY}px`;
+      ripple.style.transform = 'translate(-50%, -50%)';
+      ripple.style.pointerEvents = 'none';
+      ripple.style.zIndex = '9999';
+      ripple.style.opacity = '1';
+      
+      // Use requestAnimationFrame for smoother ripple expansion
+      document.body.appendChild(ripple);
+      
+      // Use smoother animation with requestAnimationFrame
+      let startTime = null;
+      const duration = 500; // ms
+      const initialSize = 10;
+      const targetSize = 100;
+      
+      const animateRipple = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Cubic ease out for natural motion
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const size = initialSize + (targetSize - initialSize) * easeProgress;
+        
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        
+        if (progress < 1) {
+          ripple.style.opacity = `${1 - easeProgress}`;
+          requestAnimationFrame(animateRipple);
+        } else {
+          ripple.style.opacity = '0';
+          setTimeout(() => {
+            if (document.body.contains(ripple)) {
+              document.body.removeChild(ripple);
+            }
+          }, 100);
+        }
+      };
+      
+      requestAnimationFrame(animateRipple);
+    };
+    
+    const handleMouseUp = () => {
+      cursorClickMode = false;
+      
+      // Update back to normal state (or interactive state if over interactive element)
+      if (isOverInteractive) {
+        cursorScale = 1.5;
+        cursorColor = 'rgba(6, 182, 212, 0.8)';
+      } else {
+        cursorScale = 1;
+        cursorColor = 'white';
+      }
+      
+      targetWidth = 180;
+      targetHeight = 180;
+      cursorFilter = 'blur(3px)';
+      cursorBackground = `
+        radial-gradient(
+          circle at center,
+          rgba(255, 255, 255, 0.9) 0%,
+          rgba(6, 182, 212, 0.7) 15%,
+          rgba(124, 58, 237, 0.5) 30%,
+          transparent 60%
+        )
+      `;
+      
+      if (cursorLightRef.current) {
+        cursorLightRef.current.style.filter = cursorFilter;
+        cursorLightRef.current.style.background = cursorBackground;
+      }
+    };
+    
+    // Add event listeners
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mouseup', handleMouseUp);
+    
+    // Clean up event listeners on unmount
+    return () => {
+      // Cancel animation frame to prevent memory leaks
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      
+      // Remove event listeners
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mouseup', handleMouseUp);
+      
+      // Remove cursor elements
+      if (cursorLightRef.current && document.body.contains(cursorLightRef.current)) {
+        document.body.removeChild(cursorLightRef.current);
+      }
+      if (cursorDotRef.current && document.body.contains(cursorDotRef.current)) {
+        document.body.removeChild(cursorDotRef.current);
+      }
+      
+      // Remove depth layer
+      const depthLayer = document.querySelector('.cursor-depth-reveal');
+      if (depthLayer && document.body.contains(depthLayer)) {
+        document.body.removeChild(depthLayer);
+      }
+      
+      // Reset CSS variables
+      document.documentElement.style.removeProperty('--cursor-x');
+      document.documentElement.style.removeProperty('--cursor-y');
+    };
   }, []);
 
   return (

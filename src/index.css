@@ -14,6 +14,12 @@
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
+    cursor: none; /* Hide default cursor when using custom cursor */
+  }
+  
+  /* Hide the default cursor for ALL elements */
+  * {
+    cursor: none !important;
   }
   
   /* Add glossy overlay effect */
@@ -27,6 +33,142 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
     pointer-events: none;
     z-index: 1;
+  }
+  
+  /* Add depth layers that react to cursor position */
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      repeating-linear-gradient(
+        0deg,
+        rgba(6, 182, 212, 0.03) 0px,
+        rgba(124, 58, 237, 0.02) 2px,
+        transparent 4px,
+        transparent 6px
+      );
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.15;
+    mix-blend-mode: overlay;
+  }
+  
+  /* Perspective cursor lighting effect */
+  .cursor-light {
+    position: fixed;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10000;
+    mix-blend-mode: soft-light;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(6, 182, 212, 0.7) 15%,
+      rgba(124, 58, 237, 0.5) 30%,
+      transparent 60%
+    );
+    filter: blur(3px);
+    box-shadow: 
+      0 0 20px 10px rgba(6, 182, 212, 0.25),
+      0 0 40px 20px rgba(124, 58, 237, 0.15);
+    will-change: transform, width, height, left, top, filter, background;
+    /* Add a subtle pulsing animation */
+    animation: cursorPulse 3s infinite alternate;
+  }
+  
+  /* Add subtle pulsing animation for the cursor light */
+  @keyframes cursorPulse {
+    0% {
+      box-shadow: 
+        0 0 20px 10px rgba(6, 182, 212, 0.25),
+        0 0 40px 20px rgba(124, 58, 237, 0.15);
+      filter: blur(3px);
+    }
+    50% {
+      box-shadow: 
+        0 0 25px 12px rgba(6, 182, 212, 0.3),
+        0 0 45px 22px rgba(124, 58, 237, 0.2);
+      filter: blur(3.5px);
+    }
+    100% {
+      box-shadow: 
+        0 0 20px 10px rgba(6, 182, 212, 0.25),
+        0 0 40px 20px rgba(124, 58, 237, 0.15);
+      filter: blur(3px);
+    }
+  }
+  
+  /* Add a depth layer that reacts specifically to the cursor */
+  .cursor-depth-reveal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+      transparent 10%,
+      rgba(0, 0, 0, 0.05) 20%,
+      rgba(0, 0, 0, 0.1) 30%,
+      rgba(0, 0, 0, 0.2) 60%,
+      rgba(0, 0, 0, 0.25) 100%
+    );
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.3;
+    will-change: background;
+  }
+  
+  .cursor-dot {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10001;
+    box-shadow:
+      0 0 5px rgba(255, 255, 255, 0.8),
+      0 0 10px rgba(6, 182, 212, 0.6);
+    will-change: transform, left, top, background-color, width, height;
+  }
+  
+  /* Interactive elements cursor behavior */
+  a, button, [role="button"], input, select, textarea, 
+  .element-card, [class*="interactive"], [tabindex="0"],
+  [class*="clickable"], [class*="selectable"], [class*="card"],
+  [class*="button"], [onclick], [class*="cursor"] {
+    cursor: none !important;
+  }
+  
+  a:hover ~ .cursor-dot,
+  button:hover ~ .cursor-dot,
+  [role="button"]:hover ~ .cursor-dot {
+    transform: translate(-50%, -50%) scale(1.5);
+    background-color: rgba(6, 182, 212, 0.8);
+  }
+  
+  a:hover ~ .cursor-light,
+  button:hover ~ .cursor-light,
+  [role="button"]:hover ~ .cursor-light {
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(6, 182, 212, 0.7) 20%,
+      rgba(124, 58, 237, 0.4) 35%,
+      transparent 60%
+    );
+    width: 160px;
+    height: 160px;
   }
   
   /* Global scrollbar styles */
