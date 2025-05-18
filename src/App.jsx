@@ -268,33 +268,37 @@ function App() {
     let currentOffsetY = 0;
     let rafId = null;
     
-    // Constants for smoother interpolation
-    const CURSOR_DOT_LERP_FACTOR = 0.5; // Faster for dot (more responsive)
-    const CURSOR_LIGHT_LERP_FACTOR = 0.16; // Slower for light glow (smoother trail)
-    const TRANSFORM_LERP_FACTOR = 0.14; // For transform effects
-    const SIZE_LERP_FACTOR = 0.15; // For size changes
+    // Constants for interpolation (lower values = smoother, higher = more responsive)
+    const CURSOR_DOT_LERP_FACTOR = 0.85; // Much faster for dot (more precise, less smooth)
+    const CURSOR_LIGHT_LERP_FACTOR = 0.25; // Still smooth but more responsive
+    const TRANSFORM_LERP_FACTOR = 0.2; // Slightly faster transform effects
+    const SIZE_LERP_FACTOR = 0.3; // Quicker size changes
     
     // Linear interpolation function
     const lerp = (start, end, factor) => start * (1 - factor) + end * factor;
     
-    // Animation frame function for smooth cursor updates
+    // Animation frame function for cursor updates
     const animateCursor = () => {
       if (cursorDotRef.current && cursorLightRef.current) {
-        // Interpolate positions for smooth movement
+        // For dot cursor - use faster interpolation for more precise movement
         currentX = lerp(currentX, mouseX, CURSOR_DOT_LERP_FACTOR);
         currentY = lerp(currentY, mouseY, CURSOR_DOT_LERP_FACTOR);
         
-        // Interpolate size and offset
+        // For light effect - use separate interpolation for smoother trail
+        const lightX = lerp(currentX, mouseX, CURSOR_LIGHT_LERP_FACTOR);
+        const lightY = lerp(currentY, mouseY, CURSOR_LIGHT_LERP_FACTOR);
+        
+        // Interpolate size and offset with quicker response
         currentWidth = lerp(currentWidth, targetWidth, SIZE_LERP_FACTOR);
         currentHeight = lerp(currentHeight, targetHeight, SIZE_LERP_FACTOR);
         currentOffsetX = lerp(currentOffsetX, targetOffsetX, TRANSFORM_LERP_FACTOR);
         currentOffsetY = lerp(currentOffsetY, targetOffsetY, TRANSFORM_LERP_FACTOR);
         
-        // Calculate distance from center for perspective effect
+        // Calculate distance from center for perspective effect (reduced effect)
         const centerX = window.innerWidth / 2;
         const centerY = window.innerHeight / 2;
-        const distanceX = (currentX - centerX) / centerX;
-        const distanceY = (currentY - centerY) / centerY;
+        const distanceX = (currentX - centerX) / centerX * 0.8; // Reduced effect
+        const distanceY = (currentY - centerY) / centerY * 0.8; // Reduced effect
         
         // Update cursor dot position - needs to be very responsive
         cursorDotRef.current.style.left = `${currentX}px`;
@@ -343,15 +347,15 @@ function App() {
       prevMouseX = mouseX;
       prevMouseY = mouseY;
       
-      // Dynamically adjust the light size based on mouse speed
-      const speedFactor = Math.min(Math.abs(mouseSpeed) * 0.4, 40);
+      // Dynamically adjust the light size based on mouse speed (reduced effect)
+      const speedFactor = Math.min(Math.abs(mouseSpeed) * 0.25, 25); // Reduced multiplier and max
       const baseSize = 180;
       targetWidth = baseSize + speedFactor;
       targetHeight = baseSize + speedFactor;
       
-      // Calculate slight offset based on mouse speed for more natural movement
-      targetOffsetX = Math.sign(mouseSpeedX) * Math.min(Math.abs(mouseSpeedX * 0.2), 20);
-      targetOffsetY = Math.sign(mouseSpeedY) * Math.min(Math.abs(mouseSpeedY * 0.2), 20);
+      // Calculate slight offset based on mouse speed (reduced trailing effect)
+      targetOffsetX = Math.sign(mouseSpeedX) * Math.min(Math.abs(mouseSpeedX * 0.15), 15); // Reduced
+      targetOffsetY = Math.sign(mouseSpeedY) * Math.min(Math.abs(mouseSpeedY * 0.15), 15); // Reduced
       
       // Check if cursor is over interactive elements
       const target = e.target;
@@ -434,11 +438,11 @@ function App() {
       // Use requestAnimationFrame for smoother ripple expansion
       document.body.appendChild(ripple);
       
-      // Use smoother animation with requestAnimationFrame
+      // Use faster animation with requestAnimationFrame
       let startTime = null;
-      const duration = 500; // ms
+      const duration = 350; // ms - faster
       const initialSize = 10;
-      const targetSize = 100;
+      const targetSize = 80; // smaller max size
       
       const animateRipple = (timestamp) => {
         if (!startTime) startTime = timestamp;
