@@ -7,7 +7,6 @@ import { getNeonColor } from "../utils/elementUtils";
 import { useComparison } from "../contexts/ComparisonContext";
 
 function PeriodicTable() {
-  // State hooks
   const [elements, setElements] = useState([]);
   const [filteredElements, setFilteredElements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +17,6 @@ function PeriodicTable() {
   const [filterCategory, setFilterCategory] = useState("");
   const [filterState, setFilterState] = useState("");
 
-  // Get comparison context
   const {
     addToComparison,
     elementsToCompare,
@@ -28,11 +26,9 @@ function PeriodicTable() {
     clearComparison,
   } = useComparison();
 
-  // Refs
   const tooltipRef = useRef(null);
   const wrapperRef = useRef(null);
 
-  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -59,17 +55,14 @@ function PeriodicTable() {
     fetchData();
   }, []);
 
-  // Filter elements when search term or filters change
   useEffect(() => {
     if (!elements.length) return;
 
     let result = [...elements];
 
-    // Check if any filter is active
     const isFilterActive = searchTerm || filterCategory || filterState;
 
     if (isFilterActive) {
-      // Apply search filter
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
         result = result.filter(
@@ -80,7 +73,6 @@ function PeriodicTable() {
         );
       }
 
-      // Apply category filter
       if (filterCategory) {
         result = result.filter(
           (element) =>
@@ -88,7 +80,6 @@ function PeriodicTable() {
         );
       }
 
-      // Apply state filter (solid, liquid, gas)
       if (filterState) {
         result = result.filter(
           (element) => element.phase.toLowerCase() === filterState.toLowerCase()
@@ -99,17 +90,14 @@ function PeriodicTable() {
     setFilteredElements(result);
   }, [elements, searchTerm, filterCategory, filterState]);
 
-  // Track mouse position for tooltip
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Handle tooltip positioning
   useEffect(() => {
     if (hoveredElement && tooltipRef.current) {
       const tooltip = tooltipRef.current;
       tooltip.style.left = `${mousePosition.x}px`;
       tooltip.style.top = `${mousePosition.y}px`;
 
-      // Keep tooltip in viewport
       const rect = tooltip.getBoundingClientRect();
       if (rect.right > window.innerWidth) {
         tooltip.style.left = `${window.innerWidth - rect.width - 10}px`;
@@ -120,7 +108,6 @@ function PeriodicTable() {
     }
   }, [hoveredElement, mousePosition]);
 
-  // Clear hoveredElement when mouse leaves the component
   useEffect(() => {
     const handleMouseLeave = () => setHoveredElement(null);
     const wrapper = wrapperRef.current;
@@ -129,8 +116,8 @@ function PeriodicTable() {
       wrapper.addEventListener("mouseleave", handleMouseLeave);
       return () => wrapper.removeEventListener("mouseleave", handleMouseLeave);
     }
-  }, []); // Loading error state checks
-  // Loading and error states
+  }, []);
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen text-gray-800 dark:text-gray-200">
@@ -140,7 +127,6 @@ function PeriodicTable() {
   if (error)
     return <div className="text-red-500 text-center">Error: {error}</div>;
 
-  // Extract unique categories and phases for filters
   const uniqueCategories = [
     ...new Set(elements.map((element) => element.category)),
   ].sort();
@@ -558,14 +544,12 @@ function PeriodicTable() {
         </div>
       </div>
       {/* Periodic Table Grid */}
-      <div className="grid grid-cols-18 gap-4 max-w-[1500px] mx-auto px-4">
-        {elements.map((element) => {
+      <div className="grid grid-cols-18 gap-4 max-w-[1500px] mx-auto px-4">        {elements.map((element) => {
           const isFiltered =
             searchTerm || filterCategory || filterState
               ? filteredElements.some((e) => e.number === element.number)
               : true;
 
-          // Check if element is in comparison selection
           const isInComparison = elementsToCompare.some(
             (e) => e.number === element.number
           );
@@ -608,9 +592,7 @@ function PeriodicTable() {
           );
         })}
       </div>
-      {/* Element Category Legend */}
       <CategoryLegend />
-      {/* Modal for selected element details */}
       {selectedElement && (
         <ElementDetailsModal
           element={selectedElement}
@@ -657,11 +639,10 @@ function PeriodicTable() {
           <p className="text-xs mt-3 text-center font-medium text-gray-800 dark:text-white/80 bg-white/20 dark:bg-white/10 rounded-full py-1 px-3 inline-block">
             {comparisonMode
               ? "Click to add to comparison"
-              : "Click for more details"}
+              : "Click on the for more details"}
           </p>
         </div>
       )}
-      {/* Element Comparison Tool */}
       <ElementComparisonTool />
     </div>
   );

@@ -21,7 +21,6 @@ function ElementCard({
   const numberRef = useRef(null);
 
   useEffect(() => {
-    // Special animation for comparison mode
     if (isInComparison) {
       gsap.to(cardRef.current, {
         boxShadow: `0 0 15px ${neonColor}, 0 0 25px ${neonColor}`,

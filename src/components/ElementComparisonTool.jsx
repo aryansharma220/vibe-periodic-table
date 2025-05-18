@@ -17,10 +17,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Bar, PolarArea } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import Atom3DModel from "./Atom3DModel";
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -50,14 +49,12 @@ function ElementComparisonTool() {
   const compareTableRef = useRef(null);
   const chartRef = useRef(null);
 
-  // Force activeVisType to "bar" if it was previously "radar"
   useEffect(() => {
     if (activeVisType === "radar") {
       setActiveVisType("bar");
     }
   }, [activeVisType]);
 
-  // GSAP animations when modal opens
   useEffect(() => {
     if (isComparisonOpen && modalRef.current) {
       gsap.fromTo(
@@ -72,7 +69,6 @@ function ElementComparisonTool() {
         { opacity: 1, y: 0, duration: 0.5, delay: 0.2, ease: "power2.out" }
       );
 
-      // Animate table rows appearing
       if (compareTableRef.current) {
         const rows = compareTableRef.current.querySelectorAll("tr");
         gsap.fromTo(
@@ -90,7 +86,6 @@ function ElementComparisonTool() {
       }
     }
   }, [isComparisonOpen]);
-  // Properties to visualize with enhanced metadata
   const propertiesToVisualize = [
     {
       key: "atomic_mass",
@@ -142,14 +137,12 @@ function ElementComparisonTool() {
       description: "Amount of energy needed to raise 1 mole by 1 kelvin",
     },
   ];
-  // Prepare enhanced chart data for the selected elements
   const getComparisonChartData = () => {
     if (elementsToCompare.length !== 2) return null;
 
     const element1 = elementsToCompare[0];
     const element2 = elementsToCompare[1];
 
-    // Filter out properties where either element has no data
     const validProperties = propertiesToVisualize.filter(
       (prop) =>
         element1[prop.key] &&
@@ -158,8 +151,6 @@ function ElementComparisonTool() {
         !isNaN(parseFloat(element2[prop.key]))
     );
 
-    // Sort properties by the magnitude of difference between elements
-    // This helps highlight the most significant differences
     const sortedProperties = [...validProperties].sort((a, b) => {
       const diff1 = Math.abs(
         parseFloat(element1[a.key]) - parseFloat(element2[a.key])
@@ -170,10 +161,8 @@ function ElementComparisonTool() {
       return diff2 - diff1;
     });
 
-    // Take only the top 6 most different properties to avoid chart clutter
     const topProperties = sortedProperties.slice(0, 6);
 
-    // Calculate percentage differences for tooltip display
     const percentDifferences = topProperties.map((prop) => {
       const val1 = parseFloat(element1[prop.key]);
       const val2 = parseFloat(element2[prop.key]);
@@ -187,11 +176,9 @@ function ElementComparisonTool() {
       };
     });
 
-    // Get neon colors with enhanced visual effects
     const color1 = getNeonColor(element1.category);
     const color2 = getNeonColor(element2.category);
 
-    // Create gradient backgrounds for better visual appeal
     const gradient1 = `linear-gradient(180deg, ${color1}90 0%, ${color1}40 100%)`;
     const gradient2 = `linear-gradient(180deg, ${color2}90 0%, ${color2}40 100%)`;
 
@@ -232,14 +219,12 @@ function ElementComparisonTool() {
     };
   };
 
-  // Get data for radar chart with normalized values (for comparing properties of different scales)
   const getNormalizedChartData = () => {
     if (elementsToCompare.length !== 2) return null;
 
     const element1 = elementsToCompare[0];
     const element2 = elementsToCompare[1];
 
-    // Filter out properties where either element has no data
     const validProperties = propertiesToVisualize.filter(
       (prop) =>
         element1[prop.key] &&
@@ -248,7 +233,6 @@ function ElementComparisonTool() {
         !isNaN(parseFloat(element2[prop.key]))
     );
 
-    // Normalize each property to a 0-100 scale
     const normalizedData = validProperties.map((prop) => {
       const val1 = parseFloat(element1[prop.key]);
       const val2 = parseFloat(element2[prop.key]);
@@ -297,13 +281,10 @@ function ElementComparisonTool() {
     };
   };
 
-  // Get data for polar area chart (good for showing relative proportions)
   const getPolarChartData = () => {
     if (elementsToCompare.length !== 2) return null;
 
-    const element = elementsToCompare[0]; // Just visualize first element for polar chart
-
-    // List of electronic properties best suited for polar visualization
+    const element = elementsToCompare[0];
     const electronicProperties = [
       { key: "electrons", label: "Electrons", derive: (e) => e.number },
       {
@@ -345,19 +326,13 @@ function ElementComparisonTool() {
     };
   };
 
-  // Helper function to get estimated valence electrons
   const getValenceElectrons = (element) => {
     if (!element.group) return null;
-
-    // Simple estimation based on group number (works for main group elements)
     if (element.group <= 2) return element.group;
     if (element.group >= 13) return element.group - 10;
-
-    // For transition metals, it's more complex, so return a reasonable estimate
     return element.group > 2 && element.group < 13 ? 2 : null;
   };
 
-  // Helper function to adjust colors for polar chart
   const adjustColor = (baseColor, index) => {
     const colorMap = {
       red: ["#FF5252", "#FF8A80", "#FF1744", "#D50000"],
@@ -373,12 +348,10 @@ function ElementComparisonTool() {
       gray: ["#9E9E9E", "#BDBDBD", "#757575", "#616161"],
     };
 
-    // Extract base color name
     const colorName =
       Object.keys(colorMap).find((name) => baseColor.includes(name)) || "blue";
     return colorMap[colorName][index % 4];
   };
-  // Enhanced chart options for better styling and information display
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -430,13 +403,10 @@ function ElementComparisonTool() {
             const unit = property?.unit || "";
             const percentDiff =
               chartData?.percentDifferences?.[propertyIndex]?.percentDiff;
-
-            // Create an enhanced label with value and unit
             let label = `${datasetLabel}: ${value.toLocaleString()}${
               unit ? " " + unit : ""
             }`;
 
-            // Add percentage difference information if available
             if (percentDiff) {
               const otherValue =
                 context.datasetIndex === 0
@@ -445,7 +415,6 @@ function ElementComparisonTool() {
 
               const comparison = value > otherValue ? "higher" : "lower";
 
-              // Add an additional line with difference percentage
               return [label, `${comparison} by ${percentDiff}%`];
             }
 
@@ -529,41 +498,9 @@ function ElementComparisonTool() {
       },
     },
   };
-  // Removed radar options
 
-  // Special options for polar chart
-  const polarOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: "white",
-          font: {
-            family: "system-ui",
-          },
-        },
-      },
-    },
-    scales: {
-      r: {
-        grid: {
-          color: "rgba(255, 255, 255, 0.1)",
-        },
-        ticks: {
-          backdropColor: "transparent",
-          color: "rgba(255, 255, 255, 0.7)",
-          z: 1,
-        },
-      },
-    },
-  };
-  // Prepare all chart data
   const barChartData = getComparisonChartData();
-  const polarChartData = getPolarChartData();
 
-  // Handle escape key press
   useEffect(() => {
     const handleKeydown = (e) => {
       if (e.key === "Escape" && isComparisonOpen) {
@@ -575,7 +512,6 @@ function ElementComparisonTool() {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, [isComparisonOpen, closeComparison]);
 
-  // Properties to compare with clear descriptions
   const propertiesToCompare = [
     {
       key: "number",
@@ -670,7 +606,6 @@ function ElementComparisonTool() {
     return null;
   }
 
-  // Modal animation variants for Framer Motion
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.3 } },
@@ -873,7 +808,6 @@ function ElementComparisonTool() {
                               </div>
                             </td>
                             {elementsToCompare.map((element) => {
-                              // Highlight differences between elements
                               const value1 = String(
                                 element[property.key] || "—"
                               );
@@ -1183,14 +1117,12 @@ function ElementComparisonTool() {
   );
 }
 
-// Card component to display element in comparison tool
 function ComparisonCard({ element, onRemove }) {
   const neonColor = getNeonColor(element.category);
   const cardRef = useRef(null);
   const symbolRef = useRef(null);
 
   useEffect(() => {
-    // Animate card
     gsap.fromTo(
       cardRef.current,
       {
@@ -1207,7 +1139,6 @@ function ComparisonCard({ element, onRemove }) {
       }
     );
 
-    // Animate symbol with glow effect
     gsap.to(symbolRef.current, {
       textShadow: `0 0 6px ${neonColor}, 0 0 8px ${neonColor}`,
       repeat: -1,

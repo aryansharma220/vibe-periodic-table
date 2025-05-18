@@ -1,5 +1,3 @@
-// Utility functions for the periodic table
-
 /**
  * Gets the neon color for a specific element category
  * @param {string} category - The element category

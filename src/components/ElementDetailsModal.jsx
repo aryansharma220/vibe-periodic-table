@@ -5,36 +5,27 @@ import gsap from "gsap";
 import { getNeonColor } from "../utils/elementUtils";
 import Atom3DModel from "./Atom3DModel";
 
-/**
- * ElementDetailsModal component displays detailed information about a selected element
- */
 function ElementDetailsModal({ element, onClose }) {
-  // Get neon color for this element
   const neonColor = getNeonColor(element.category);
 
-  // Refs for GSAP animations
   const modalRef = useRef(null);
   const symbolRef = useRef(null);
   const headerRef = useRef(null);
   const contentRefs = useRef([]);
 
-  // Add to content refs collection
   const addToContentRefs = (el) => {
     if (el && !contentRefs.current.includes(el)) {
       contentRefs.current.push(el);
     }
   };
 
-  // GSAP animations when modal opens
   useEffect(() => {
-    // Animate the modal entrance
     gsap.fromTo(
       modalRef.current,
       { scale: 0.8, opacity: 0 },
       { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }
     );
 
-    // Animate the symbol with a glow effect
     gsap.fromTo(
       symbolRef.current,
       { scale: 0.8, opacity: 0 },
@@ -46,7 +37,6 @@ function ElementDetailsModal({ element, onClose }) {
       }
     );
 
-    // Create a pulsing glow effect
     gsap.to(symbolRef.current, {
       boxShadow: `0 0 20px ${neonColor}, inset 0 0 15px ${neonColor}`,
       repeat: -1,
@@ -54,14 +44,12 @@ function ElementDetailsModal({ element, onClose }) {
       duration: 1.5,
     });
 
-    // Animate header with a slide-in effect
     gsap.fromTo(
       headerRef.current,
       { x: -50, opacity: 0 },
       { x: 0, opacity: 1, duration: 0.6, delay: 0.2 }
     );
 
-    // Animate content sections one by one with stagger
     gsap.fromTo(
       contentRefs.current,
       { y: 30, opacity: 0 },
@@ -76,7 +64,6 @@ function ElementDetailsModal({ element, onClose }) {
     );
 
     return () => {
-      // Cleanup animation timelines
       gsap.killTweensOf([
         modalRef.current,
         symbolRef.current,
@@ -86,7 +73,6 @@ function ElementDetailsModal({ element, onClose }) {
     };
   }, [neonColor]);
 
-  // Modal animation variants for Framer Motion
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.3 } },
@@ -230,11 +216,8 @@ function ElementDetailsModal({ element, onClose }) {
             </svg>
           </motion.button>{" "}
         </div>{" "}
-        {/* Main Content - Left-Right Split Layout */}
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Side Content */}
           <div className="w-full lg:w-1/2">
-            {/* Element Properties */}
             <div className="grid grid-cols-1 gap-4 mb-4">
               <motion.div
                 ref={addToContentRefs}
@@ -347,7 +330,6 @@ function ElementDetailsModal({ element, onClose }) {
               </motion.div>
             </div>
 
-            {/* Summary Section */}
             <motion.div
               ref={addToContentRefs}
               className="rounded-lg p-4 backdrop-blur-sm"
@@ -385,7 +367,7 @@ function ElementDetailsModal({ element, onClose }) {
                 {element.summary}
               </p>
             </motion.div>
-          </div>          {/* Right Side - 3D Atom Model */}
+          </div>          
           <motion.div
             ref={addToContentRefs}
             className="w-full lg:w-1/2 rounded-lg p-4 backdrop-blur-sm h-full flex flex-col min-h-[600px]"
@@ -409,7 +391,8 @@ function ElementDetailsModal({ element, onClose }) {
               borderRight: "1px solid rgba(0, 0, 0, 0.1)",
               borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
             }}
-          >            <h3
+          >            
+            <h3
               className="font-bold text-lg mb-2 border-b border-white/20 dark:border-white/10 pb-1"
               style={{ textShadow: "0 1px 1px rgba(0, 0, 0, 0.1)" }}
             >
@@ -423,7 +406,6 @@ function ElementDetailsModal({ element, onClose }) {
               />
             </div>
             
-            {/* Atomic Structure Information */}
             <div className="mt-4 border-t border-white/10 pt-3 grid grid-cols-2 gap-3">
               <div className="bg-white/5 rounded-lg p-2 backdrop-blur-sm flex flex-col items-center">
                 <span className="text-sm text-gray-400">Protons</span>
