@@ -238,7 +238,7 @@ function App() {
           <div className="relative z-10">
             <PeriodicTable />
             <ElementComparisonTool />
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
             <Chatbot />
           </div>
         </div>
