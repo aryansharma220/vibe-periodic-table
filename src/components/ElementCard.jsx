@@ -236,7 +236,7 @@ function ElementCard({
   return (
     <motion.div
       ref={cardRef}
-      className={`${elementStyle} p-2.5 min-h-14 flex flex-col justify-between cursor-pointer ${textStyle}`}
+      className={`${elementStyle} p-1.5 min-h-14 flex flex-col justify-between cursor-pointer ${textStyle}`}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}      onMouseLeave={handleMouseLeave}
       initial="initial"
