@@ -1,6 +1,7 @@
 import PeriodicTable from "./components/PeriodicTable";
 import ThemeToggle from "./components/ThemeToggle";
 import ElementComparisonTool from "./components/ElementComparisonTool";
+import Chatbot from "./components/Chatbot";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ComparisonProvider } from "./contexts/ComparisonContext";
 import { useEffect, useRef, useState } from "react";
@@ -237,6 +238,8 @@ function App() {
           <div className="relative z-10">
             <PeriodicTable />
             <ElementComparisonTool />
+            <ThemeToggle />
+            <Chatbot />
           </div>
         </div>
       </ComparisonProvider>
